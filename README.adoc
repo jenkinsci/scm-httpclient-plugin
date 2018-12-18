@@ -14,6 +14,7 @@
 ____
 The simplest way to know what has changed on your Jenkins builds after developers submit code! Also, the scm changePaths and job changes can be send to http request body as parms. 
 
+____
 IMPORTANT: Only `Git` and `Svn` based projects are supported.
 
 == Introduction
@@ -30,11 +31,14 @@ The plugin shows changes via compare last with previous build SCM revision diffs
 
 After installation, activate after the build steps SCM HttpClient Plugin. 
 
-Activate after the build steps
-
+. Activate after the build steps
++
+image:p2.jpg
 == Configuration
 
-The setup is done via build configuration:
+. The setup is done via build configuration:
++
+image:p2.jpg[link=https://raw.githubusercontent.com/meowlomo/scm-httpclient-plugin/master/images/p2.jpg]
 
 if Print changeLog attribute is true,the build changes will be show on console
 
