@@ -1,6 +1,27 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+	<f:entry title="Save changeSets" field="save_change_set" default ="true"
+                 description="check if save change sets from the SCM plugins.">
+            <f:checkbox />
+	</f:entry>
+	<f:entry title="Save affectPaths" field="save_affect_path" default ="true"
+                 description="check if save affect paths from the SCM plugins.">
+            <f:checkbox />
+	</f:entry>
     <f:entry field="url" title="URL">
         <f:textbox />
     </f:entry>
+    <f:entry field="httpMode" title="HTTP mode">
+        <f:select default="POST"/>
+    </f:entry>
+    <f:section title="Headers">
+        <f:entry field="contentType" title="Content-type">
+            <f:select default="APPLICATION_JSON"/>
+        </f:entry>
+    </f:section>
+    <f:section title="Body">
+        <f:entry field="requestBody" title="Request body">
+            <f:textarea />
+        </f:entry>
+    </f:section>
 </j:jelly>
