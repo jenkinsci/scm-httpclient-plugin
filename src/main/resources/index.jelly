@@ -1,5 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-  This plugin reads the build workspace to generate VCS (git or svn) rich html diffs by comparing current build revision with previous build revision.
-  Inaddition to,it can send http request.
+    TODO
 </div>
