@@ -1,6 +1,10 @@
 package com.meowlomo.jenkins;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.kohsuke.stapler.AncestorInPath;
@@ -13,9 +17,12 @@ import com.meowlomo.jenkins.model.MimeType;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.scm.ChangeLogSet;
+import hudson.scm.ChangeLogSet.Entry;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
@@ -30,8 +37,8 @@ import jenkins.tasks.SimpleBuildStep;
 public class SCMHttpClientPublisher extends Recorder implements SimpleBuildStep {
 
 	private static Logger LOG = Logger.getLogger(SCMHttpClientPublisher.class.getName());
-	private boolean save_change_set;
-	private boolean save_affect_path;
+	private boolean save_build_detail; // the job's build message
+	private boolean save_affect_path; // scm affect paths
 	private String url;
 	private HttpMode httpMode;
 	private MimeType contentType;
@@ -42,13 +49,13 @@ public class SCMHttpClientPublisher extends Recorder implements SimpleBuildStep 
 		this.url = url;
 	}
 
-	public boolean isSaveChangeSet() {
-		return save_change_set;
+	public boolean isSaveBuildDtail() {
+		return save_build_detail;
 	}
 
 	@DataBoundSetter
-	public void setSaveChangeSet(Boolean save_change_set) {
-		this.save_change_set = save_change_set;
+	public void setSaveBuildDetail(Boolean save_build_detail) {
+		this.save_build_detail = save_build_detail;
 	}
 
 	public boolean isSaveAffectPath() {
@@ -99,7 +106,35 @@ public class SCMHttpClientPublisher extends Recorder implements SimpleBuildStep 
 	@Override
 	public void perform(Run<?, ?> run, FilePath filePath, Launcher launcher, TaskListener listener)
 			throws InterruptedException, IOException {
+		listener.getLogger().println("trigger scm httpclient services...");
+		List<String> affectPaths = getAffectedPaths(run);
+		for(String path : affectPaths){
+			listener.getLogger().println(path);
+		}
+	}
 
+	/**
+	 * Retrieve affectedPaths from the SCM plugin
+	 *
+	 * @param run
+	 *
+	 */
+	public List<String> getAffectedPaths(Run<?, ?> run) {
+		List<String> affectedPaths = new ArrayList<String>();
+		ChangeLogSet<? extends Entry> cls = ((AbstractBuild<?, ?>) run).getChangeSet();
+		if (!cls.isEmptySet()) {
+			for (ChangeLogSet.Entry e : cls) {
+				Collection<String> paths = e.getAffectedPaths();
+				Iterator<String> it = paths.iterator();
+				while (it.hasNext()) {
+					String path = it.next();
+					affectedPaths.add(path);
+				}
+			}
+			return affectedPaths;
+		} else {
+			return null;
+		}
 	}
 
 	@Extension
