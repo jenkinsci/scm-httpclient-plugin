@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.meowlomo.jenkins.ci;
+package com.meowlomo.jenkins.scm_httpclient;
 
 import static com.meowlomo.jenkins.ci.impl.GitLastChanges.repository;
 
@@ -117,7 +117,7 @@ public class ScmExcution {
 
 	}
 
-	public ScmExcution from(CI ci, Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener,
+	public ScmExcution from(ScmHttpClient ci, Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener,
 			Map<String, String> variables, boolean printChangeLog) throws IOException, InterruptedException {
 		printChangeLog = ci.isPrintChangeLog();
 		handleAffectedPaths = ci.isHandleAffectedPaths();

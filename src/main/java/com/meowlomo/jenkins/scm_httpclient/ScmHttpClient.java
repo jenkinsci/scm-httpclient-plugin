@@ -1,4 +1,4 @@
-package com.meowlomo.jenkins.ci;
+package com.meowlomo.jenkins.scm_httpclient;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -43,7 +43,7 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.tasks.SimpleBuildStep;
 
-public class CI extends Recorder implements SimpleBuildStep, Serializable {
+public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -74,7 +74,7 @@ public class CI extends Recorder implements SimpleBuildStep, Serializable {
 	private String validResponseContent = DescriptorImpl.validResponseContent;
 
 	@DataBoundConstructor
-	public CI(boolean printChangeLog, boolean sendHttpRequest, @Nonnull String url, boolean handleAffectedPaths,
+	public ScmHttpClient(boolean printChangeLog, boolean sendHttpRequest, @Nonnull String url, boolean handleAffectedPaths,
 			String cut, String contain) {
 		this.printChangeLog = printChangeLog;
 		this.handleAffectedPaths = handleAffectedPaths;

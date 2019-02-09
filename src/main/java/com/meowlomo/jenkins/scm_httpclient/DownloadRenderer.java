@@ -1,4 +1,4 @@
-package com.meowlomo.jenkins.ci;
+package com.meowlomo.jenkins.scm_httpclient;
 
 import java.io.ByteArrayInputStream;
 import org.kohsuke.stapler.StaplerRequest;

@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package com.meowlomo.jenkins.ci;
+package com.meowlomo.jenkins.scm_httpclient;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -53,13 +53,13 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
 import com.google.common.collect.Range;
-import com.meowlomo.jenkins.ci.CI.DescriptorImpl;
 import com.meowlomo.jenkins.ci.constant.HttpMode;
 import com.meowlomo.jenkins.ci.constant.ResponseHandle;
 import com.meowlomo.jenkins.ci.util.HttpClientUtil;
 import com.meowlomo.jenkins.ci.util.HttpRequestNameValuePair;
 import com.meowlomo.jenkins.ci.util.RequestAction;
 import com.meowlomo.jenkins.ci.util.UnescapeUtil;
+import com.meowlomo.jenkins.scm_httpclient.ScmHttpClient.DescriptorImpl;
 
 import hudson.AbortException;
 import hudson.CloseProofOutputStream;
@@ -84,7 +84,7 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 	private final String validResponseCodes;
 	private final String validResponseContent;
 
-	static HttpRequestExecution from(CI http, EnvVars envVars, Run<?, ?> build, TaskListener taskListener,
+	static HttpRequestExecution from(ScmHttpClient http, EnvVars envVars, Run<?, ?> build, TaskListener taskListener,
 			Map<String, String> variables) {
 		try {
 			String url = http.resolveUrl(envVars, build, taskListener);

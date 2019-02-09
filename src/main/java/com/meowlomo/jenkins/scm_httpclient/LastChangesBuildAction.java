@@ -1,4 +1,4 @@
-package com.meowlomo.jenkins.ci;
+package com.meowlomo.jenkins.scm_httpclient;
 
 import com.meowlomo.jenkins.ci.model.CommitChanges;
 import com.meowlomo.jenkins.ci.model.LastChanges;
