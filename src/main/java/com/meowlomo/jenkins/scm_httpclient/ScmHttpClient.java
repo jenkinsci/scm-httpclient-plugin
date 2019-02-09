@@ -60,18 +60,18 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	private boolean sendHttpRequest;
 
 	private @Nonnull String url;
-
-	private HttpMode httpMode = DescriptorImpl.httpMode;
-
-	private MimeType acceptType = DescriptorImpl.acceptType;
-
-	private MimeType contentType = DescriptorImpl.contentType;
-
-	private String requestBody = DescriptorImpl.requestBody;
-
-	private String validResponseCodes = DescriptorImpl.validResponseCodes;
-
-	private String validResponseContent = DescriptorImpl.validResponseContent;
+	
+	private HttpMode httpMode;
+	
+	private MimeType acceptType;
+	
+	private MimeType contentType;
+	
+	private String validResponseCodes;
+	
+	private String validResponseContent;
+	
+	private String requestBody;
 
 	@DataBoundConstructor
 	public ScmHttpClient(boolean printChangeLog, boolean sendHttpRequest, @Nonnull String url, boolean handleAffectedPaths,
@@ -85,18 +85,22 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	}
 
 	@Override
-	public void perform(Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener)
+	public void perform(Run<?, ?> run, FilePath workspace, Launcher launcher, TaskListener listener)
 			throws IOException, InterruptedException {
+		System.out.println("requestBody"+requestBody+"validResponseContent"+validResponseContent+"validResponseCodes"+validResponseCodes);
+		System.out.println("contentType"+contentType+"acceptType"+acceptType+"httpMode"+httpMode+"url"+url);
 		// execute scm work
-		ScmExcution se = new ScmExcution();
-		se.from(this, build, workspace, launcher, listener, variables, printChangeLog);
-
-		if (isSendHttpRequest()) {
-			EnvVars envVars = build.getEnvironment(listener);
-			HttpRequestExecution exec = HttpRequestExecution.from(this, envVars, build, listener, variables);
-			launcher.getChannel().call(exec);
-		}
-		build.setResult(Result.SUCCESS);
+//		ScmExcution se = new ScmExcution();
+//		se.from(this, build, workspace, launcher, listener, variables, printChangeLog);
+//
+//		if (isSendHttpRequest()) {
+//			EnvVars envVars = build.getEnvironment(listener);
+//			HttpRequestExecution exec = HttpRequestExecution.from(this, envVars, build, listener, variables);
+//			launcher.getChannel().call(exec);
+//		}
+//		build.setResult(Result.SUCCESS);
+		Excution excution = new Excution(requestBody);
+		excution.doMainWork(run);
 	}
 
 	@Override
@@ -105,15 +109,7 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	}
 
 	@Extension
-	@Symbol("SCM HttpClient")
 	public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
-		public static final HttpMode httpMode = HttpMode.GET;
-		public static final MimeType acceptType = MimeType.NOT_SET;
-		public static final MimeType contentType = MimeType.NOT_SET;
-		public static final String validResponseCodes = "100:399";
-		public static final String validResponseContent = "";
-		public static final String requestBody = "";
-
 		public boolean isApplicable(Class<? extends AbstractProject> aClass) {
 			return true;
 		}

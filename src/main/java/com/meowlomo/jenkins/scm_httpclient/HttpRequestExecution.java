@@ -58,7 +58,6 @@ import com.meowlomo.jenkins.ci.constant.ResponseHandle;
 import com.meowlomo.jenkins.ci.util.HttpClientUtil;
 import com.meowlomo.jenkins.ci.util.HttpRequestNameValuePair;
 import com.meowlomo.jenkins.ci.util.RequestAction;
-import com.meowlomo.jenkins.ci.util.UnescapeUtil;
 import com.meowlomo.jenkins.scm_httpclient.ScmHttpClient.DescriptorImpl;
 
 import hudson.AbortException;
@@ -131,7 +130,7 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 			HttpClientBuilder clientBuilder = HttpClientBuilder.create();
 			HttpClientUtil clientUtil = new HttpClientUtil();
 			// handled special string on body
-			body = UnescapeUtil.replaceSprcialString(body, variables);
+//			body = UnescapeUtil.replaceSprcialString(body, variables);
 			logger().println("body >" + body);
 			
 			HttpRequestBase httpRequestBase = clientUtil
