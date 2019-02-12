@@ -25,10 +25,10 @@ public class Excution {
 		this.requestBody = requestBody;
 	}
 
-	public void doMainWork(Run<?, ?> run,TaskListener listener) {
+	public void doScmWork(Run<?, ?> run,TaskListener listener) {
 		try {
 			if (isScmChange(run)) {
-				listener.getLogger().println("the scm has changes...");
+				listener.getLogger().println("the scm has changed...");
 				Collection<String> affectedPaths = getAffectedPaths(run);
 				Iterator<String> it = affectedPaths.iterator();
 				while (it.hasNext()) {
@@ -38,10 +38,10 @@ public class Excution {
 				// do save affectedPath to globe map work
 				saveAffectedPathsToJson(affectedPaths);
 			} else {
-				listener.getLogger().println("the scm hasn't changes.");
+				listener.getLogger().println("the scm hasn't changed.");
 			}
 		} catch (Exception e) {
-			System.out.println(e);
+			listener.getLogger().println(e);
 		}
 
 		// Collection<String> affectedPaths = getAffectedPaths(run);
