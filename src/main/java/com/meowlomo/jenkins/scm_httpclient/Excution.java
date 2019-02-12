@@ -7,21 +7,43 @@ import java.util.Map;
 
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import com.alibaba.fastjson.JSON;
 import com.meowlomo.jenkins.ci.model.JenkinsEnvs;
 import com.meowlomo.jenkins.ci.util.HttpClientUtil;
 import hudson.model.AbstractBuild;
 import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
 
 public class Excution {
 	private String requestBody;
 
+	Map<String, String> variables = new HashMap<String, String>();
+
 	public Excution(String requestBody) {
 		this.requestBody = requestBody;
 	}
 
-	public boolean doMainWork(Run<?, ?> run) {
+	public void doMainWork(Run<?, ?> run,TaskListener listener) {
+		try {
+			if (isScmChange(run)) {
+				listener.getLogger().println("the scm has changes...");
+				Collection<String> affectedPaths = getAffectedPaths(run);
+				Iterator<String> it = affectedPaths.iterator();
+				while (it.hasNext()) {
+					String path = (String) it.next();
+					listener.getLogger().println("the scm changed path > " + path);
+				}
+				// do save affectedPath to globe map work
+				saveAffectedPathsToJson(affectedPaths);
+			} else {
+				listener.getLogger().println("the scm hasn't changes.");
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+
 		// Collection<String> affectedPaths = getAffectedPaths(run);
 		// if (affectedPaths != null) {
 		// isChange = true;
@@ -36,40 +58,61 @@ public class Excution {
 		// }
 
 		// getPartOfJenkinsEnvs
-		return false;
 	}
 
-	public void request() {
-		HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-		HttpClientUtil clientUtil = new HttpClientUtil();
-		// handled special string on requestBody
-		// if (variables) {
-		//
-		// }
-		// body = UnescapeUtil.replaceSprcialString(requestBody, variables);
+//	public void request() {
+//		HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+//		HttpClientUtil clientUtil = new HttpClientUtil();
+	// handled special string on requestBody
+	// if (variables) {
+	//
+	// }
+	// body = UnescapeUtil.replaceSprcialString(requestBody, variables);
 
-	}
-
-	public boolean scmChangesHandle(Run<?, ?> run) {
+//	}
+	public boolean isScmChange(Run<?, ?> run) {
 		boolean isChange = false;
-		Collection<String> affectedPaths = null;
-		ChangeLogSet<? extends Entry> cls = ((AbstractBuild<?, ?>) run).getChangeSet();
+		ChangeLogSet<? extends Entry> cls = getChangeSet(run);
 		if (!cls.isEmptySet()) {
-			for (ChangeLogSet.Entry e : cls) {
-				affectedPaths = e.getAffectedPaths();
-			}
-		}
-		if (affectedPaths != null) {
 			isChange = true;
-			saveAffectedPaths(affectedPaths);
 		}
 		return isChange;
 	}
 
-	private void saveAffectedPaths(Collection<String> affectedPaths) {
-//		Map<String, ?> variables = new HashMap<String, String>();
-//		variables.put("affectedPaths", affectedPaths);
-		
+	public Collection<String> getAffectedPaths(Run<?, ?> run) {
+		Collection<String> affectedPaths = null;
+		ChangeLogSet<? extends Entry> cls = getChangeSet(run);
+		for (ChangeLogSet.Entry e : cls) {
+			affectedPaths = e.getAffectedPaths();
+		}
+		return affectedPaths;
+	}
+
+	public ChangeLogSet<? extends Entry> getChangeSet(Run<?, ?> run) {
+		return ((AbstractBuild<?, ?>) run).getChangeSet();
+	}
+
+//	public boolean scmChangesHandle(Run<?, ?> run) {
+//		boolean isChange = false;
+//		Collection<String> affectedPaths = null;
+//		ChangeLogSet<? extends Entry> cls = ((AbstractBuild<?, ?>) run).getChangeSet();
+//		if (!cls.isEmptySet()) {
+//			for (ChangeLogSet.Entry e : cls) {
+//				affectedPaths = e.getAffectedPaths();
+//			}
+//		}
+//		if (affectedPaths != null) {
+//			isChange = true;
+//			saveAffectedPaths(affectedPaths);
+//		}
+//		return isChange;
+//	}
+
+	private void saveAffectedPathsToJson(Collection<String> affectedPaths) {
+		if (!affectedPaths.isEmpty()) {
+			String AFFECTED_PATH = JSON.toJSONString(affectedPaths);
+			variables.put("AFFECTED_PATH", AFFECTED_PATH);
+		}
 	}
 
 	public JenkinsEnvs getPartOfJenkinsEnvs(Run<?, ?> run) {

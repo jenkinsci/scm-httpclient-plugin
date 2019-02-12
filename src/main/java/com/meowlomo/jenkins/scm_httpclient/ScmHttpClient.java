@@ -94,7 +94,7 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 		// }
 		// build.setResult(Result.SUCCESS);
 		Excution excution = new Excution(requestBody);
-		excution.doMainWork(run);
+		excution.doMainWork(run,listener);
 	}
 
 	@Override
