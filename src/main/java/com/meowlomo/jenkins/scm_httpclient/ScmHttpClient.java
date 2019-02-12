@@ -11,7 +11,6 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -25,14 +24,11 @@ import com.meowlomo.jenkins.ci.constant.MimeType;
 import com.meowlomo.jenkins.ci.model.FormatType;
 import com.meowlomo.jenkins.ci.model.MatchingType;
 import com.meowlomo.jenkins.ci.model.SinceType;
-import com.meowlomo.jenkins.ci.util.HttpRequestNameValuePair;
 
-import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractProject;
-import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
@@ -46,9 +42,9 @@ import jenkins.tasks.SimpleBuildStep;
 public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializable {
 
 	private static final long serialVersionUID = 1L;
-
+	
 	Map<String, String> variables = new HashMap<String, String>();
-
+	
 	private boolean printChangeLog;
 
 	private boolean handleAffectedPaths;
@@ -60,45 +56,43 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	private boolean sendHttpRequest;
 
 	private @Nonnull String url;
-	
+
 	private HttpMode httpMode;
-	
+
 	private MimeType acceptType;
-	
+
 	private MimeType contentType;
-	
+
 	private String validResponseCodes;
-	
+
 	private String validResponseContent;
-	
+
 	private String requestBody;
 
 	@DataBoundConstructor
-	public ScmHttpClient(boolean printChangeLog, boolean sendHttpRequest, @Nonnull String url, boolean handleAffectedPaths,
-			String cut, String contain) {
-		this.printChangeLog = printChangeLog;
-		this.handleAffectedPaths = handleAffectedPaths;
-		this.cut = cut;
-		this.contain = contain;
-		this.sendHttpRequest = sendHttpRequest;
+	public ScmHttpClient(String url) {
 		this.url = url;
 	}
 
 	@Override
 	public void perform(Run<?, ?> run, FilePath workspace, Launcher launcher, TaskListener listener)
 			throws IOException, InterruptedException {
-		System.out.println("requestBody"+requestBody+"validResponseContent"+validResponseContent+"validResponseCodes"+validResponseCodes);
-		System.out.println("contentType"+contentType+"acceptType"+acceptType+"httpMode"+httpMode+"url"+url);
+		System.out.println("requestBody" + requestBody + "validResponseContent" + validResponseContent
+				+ "validResponseCodes" + validResponseCodes);
+		System.out
+				.println("contentType" + contentType + "acceptType" + acceptType + "httpMode" + httpMode + "url" + url);
 		// execute scm work
-//		ScmExcution se = new ScmExcution();
-//		se.from(this, build, workspace, launcher, listener, variables, printChangeLog);
-//
-//		if (isSendHttpRequest()) {
-//			EnvVars envVars = build.getEnvironment(listener);
-//			HttpRequestExecution exec = HttpRequestExecution.from(this, envVars, build, listener, variables);
-//			launcher.getChannel().call(exec);
-//		}
-//		build.setResult(Result.SUCCESS);
+		// ScmExcution se = new ScmExcution();
+		// se.from(this, build, workspace, launcher, listener, variables,
+		// printChangeLog);
+		//
+		// if (isSendHttpRequest()) {
+		// EnvVars envVars = build.getEnvironment(listener);
+		// HttpRequestExecution exec = HttpRequestExecution.from(this, envVars, build,
+		// listener, variables);
+		// launcher.getChannel().call(exec);
+		// }
+		// build.setResult(Result.SUCCESS);
 		Excution excution = new Excution(requestBody);
 		excution.doMainWork(run);
 	}
@@ -165,7 +159,6 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 			if (value == null || value.trim().isEmpty()) {
 				return FormValidation.ok();
 			}
-
 			try {
 				parseToRange(value);
 			} catch (IllegalArgumentException iae) {
@@ -177,7 +170,7 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 
 		public static List<Range<Integer>> parseToRange(String value) {
 			List<Range<Integer>> validRanges = new ArrayList<Range<Integer>>();
-
+			System.out.println("parseToRange > value:" + value);
 			String[] codes = value.split(",");
 			for (String code : codes) {
 				String[] fromTo = code.trim().split(":");
@@ -312,27 +305,4 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	public void setValidResponseContent(String validResponseContent) {
 		this.validResponseContent = validResponseContent;
 	}
-
-	///////// http request
-	String resolveUrl(EnvVars envVars, Run<?, ?> build, TaskListener listener) throws IOException {
-		String url = envVars.expand(getUrl());
-		return url;
-	}
-
-	String resolveBody(EnvVars envVars, Run<?, ?> build, TaskListener listener) throws IOException {
-		String body = envVars.expand(getRequestBody());
-		return body;
-	}
-
-	List<HttpRequestNameValuePair> resolveHeaders(EnvVars envVars) {
-		final List<HttpRequestNameValuePair> headers = new ArrayList<>();
-		if (contentType != null && contentType != MimeType.NOT_SET) {
-			headers.add(new HttpRequestNameValuePair("Content-type", contentType.getContentType().toString()));
-		}
-		if (acceptType != null && acceptType != MimeType.NOT_SET) {
-			headers.add(new HttpRequestNameValuePair("Accept", acceptType.getValue()));
-		}
-		return headers;
-	}
-
 }
