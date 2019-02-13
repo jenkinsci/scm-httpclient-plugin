@@ -42,9 +42,9 @@ import jenkins.tasks.SimpleBuildStep;
 public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	Map<String, String> variables = new HashMap<String, String>();
-	
+
 	private boolean printChangeLog;
 
 	private boolean handleAffectedPaths;
@@ -94,7 +94,7 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 		// }
 		// build.setResult(Result.SUCCESS);
 		Excution excution = new Excution(requestBody);
-		excution.doMainWork(run,listener);
+		excution.doScmWork(run,listener);
 	}
 
 	@Override
@@ -104,10 +104,12 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 
 	@Extension
 	public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
+		@Override
 		public boolean isApplicable(Class<? extends AbstractProject> aClass) {
 			return true;
 		}
 
+		@Override
 		public String getDisplayName() {
 			return "SCM HttpClient";
 		}
