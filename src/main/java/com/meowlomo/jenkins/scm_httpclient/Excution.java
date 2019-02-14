@@ -17,12 +17,10 @@ import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
 
 public class Excution {
-	private String requestBody;
-
+	
 	Map<String, String> variables = new HashMap<String, String>();
-
-	public Excution(String requestBody) {
-		this.requestBody = requestBody;
+	public Excution() {
+		
 	}
 
 	public void doScmWork(AbstractBuild<?,?> build,TaskListener listener) {
@@ -43,33 +41,8 @@ public class Excution {
 		} catch (Exception e) {
 			listener.getLogger().println(e);
 		}
-
-		// Collection<String> affectedPaths = getAffectedPaths(run);
-		// if (affectedPaths != null) {
-		// isChange = true;
-		// Iterator<String> it = affectedPaths.iterator();
-		// while (it.hasNext()) {
-		// String path = (String) it.next();
-		// System.out.println("path > " + path);
-		// }
-		// }
-		// else {
-		// isChange = false;
-		// }
-
-		// getPartOfJenkinsEnvs
 	}
 
-//	public void request() {
-//		HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-//		HttpClientUtil clientUtil = new HttpClientUtil();
-	// handled special string on requestBody
-	// if (variables) {
-	//
-	// }
-	// body = UnescapeUtil.replaceSprcialString(requestBody, variables);
-
-//	}
 	public boolean isScmChange(Run<?, ?> run) {
 		boolean isChange = false;
 		ChangeLogSet<? extends Entry> cls = getChangeSet(run);
@@ -92,36 +65,11 @@ public class Excution {
 		return ((AbstractBuild<?, ?>) run).getChangeSet();
 	}
 
-//	public boolean scmChangesHandle(Run<?, ?> run) {
-//		boolean isChange = false;
-//		Collection<String> affectedPaths = null;
-//		ChangeLogSet<? extends Entry> cls = ((AbstractBuild<?, ?>) run).getChangeSet();
-//		if (!cls.isEmptySet()) {
-//			for (ChangeLogSet.Entry e : cls) {
-//				affectedPaths = e.getAffectedPaths();
-//			}
-//		}
-//		if (affectedPaths != null) {
-//			isChange = true;
-//			saveAffectedPaths(affectedPaths);
-//		}
-//		return isChange;
-//	}
-
 	private void saveAffectedPathsToJson(Collection<String> affectedPaths) {
 		if (!affectedPaths.isEmpty()) {
 			String AFFECTED_PATH = JSON.toJSONString(affectedPaths);
 			variables.put("AFFECTED_PATH", AFFECTED_PATH);
 		}
-	}
-
-	public JenkinsEnvs getPartOfJenkinsEnvs(Run<?, ?> run) {
-		Map<String, String> envs = run.getEnvVars();
-		for (Map.Entry<String, String> entry : envs.entrySet()) {
-			System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
-		}
-		return null;
-
 	}
 
 }

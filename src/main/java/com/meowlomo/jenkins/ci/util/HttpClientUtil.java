@@ -125,7 +125,6 @@ public class HttpClientUtil {
         logger.println("Sending request to url: " + method.getURI());
         final HttpResponse httpResponse = client.execute(method, context);
         logger.println("Response Code: " + httpResponse.getStatusLine());
-
         return httpResponse;
     }
 

@@ -23,7 +23,7 @@ import hudson.EnvVars;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 
-public class HttpExcusion {
+public class HttpExcution {
 
 	private String url;
 	private HttpMode httpMode;
@@ -35,11 +35,11 @@ public class HttpExcusion {
 
 	private transient PrintStream localLogger;
 
-	public HttpExcusion() {
+	public HttpExcution() {
 
 	}
 
-	private HttpExcusion(String url, HttpMode httpMode, String body, MimeType contentType,
+	private HttpExcution(String url, HttpMode httpMode, String body, MimeType contentType,
 			List<HttpRequestNameValuePair> headers, String validResponseCodes, String validResponseContent) {
 		this.url = url;
 		this.httpMode = httpMode;
@@ -50,7 +50,7 @@ public class HttpExcusion {
 		this.validResponseContent = validResponseContent != null ? validResponseContent : "";
 	}
 
-	public HttpExcusion from(ScmHttpClient shc, EnvVars envVars, Run<?, ?> run, TaskListener taskListener) {
+	public HttpExcution from(ScmHttpClient shc, EnvVars envVars, Run<?, ?> run, TaskListener taskListener) {
 		this.url = shc.getUrl();
 		this.httpMode = shc.getHttpMode();
 		this.body = shc.getRequestBody();
@@ -58,7 +58,7 @@ public class HttpExcusion {
 		this.validResponseCodes = shc.getValidResponseCodes();
 		this.validResponseContent = shc.getValidResponseContent();
 		List<HttpRequestNameValuePair> headers = resolveHeaders(envVars);
-		HttpExcusion httpExcusion = new HttpExcusion(url, httpMode, body, contentType, headers, validResponseCodes,
+		HttpExcution httpExcusion = new HttpExcution(url, httpMode, body, contentType, headers, validResponseCodes,
 				validResponseContent);
 		this.headers = headers;
 		localLogger = taskListener.getLogger();
@@ -66,12 +66,12 @@ public class HttpExcusion {
 	}
 
 	public HttpResponse request() {
-		System.out.println("print now > ");
-		System.out.println(url.toString() + "?" + httpMode + "?" + body + "?" + headers.get(0));
 		try {
 			HttpClientBuilder clientBuilder = HttpClientBuilder.create();
 			CloseableHttpClient httpclient = clientBuilder.build();
 			HttpClientUtil clientUtil = new HttpClientUtil();
+			localLogger.println("URL:"+url);
+			localLogger.println("HttpMethod:"+httpMode);
 			HttpRequestBase httpRequestBase = clientUtil
 					.createRequestBase(new RequestAction(new URL(url), httpMode, body, null, headers));
 			HttpContext context = new BasicHttpContext();

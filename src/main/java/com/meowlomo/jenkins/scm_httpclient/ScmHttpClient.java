@@ -23,8 +23,6 @@ import com.google.common.collect.Ranges;
 import com.meowlomo.jenkins.ci.constant.HttpMode;
 import com.meowlomo.jenkins.ci.constant.MimeType;
 import com.meowlomo.jenkins.ci.model.FormatType;
-import com.meowlomo.jenkins.ci.model.MatchingType;
-import com.meowlomo.jenkins.ci.model.SinceType;
 
 import hudson.EnvVars;
 import hudson.Extension;
@@ -81,15 +79,12 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	public void perform(Run<?, ?> run, FilePath workspace, Launcher launcher, TaskListener listener)
 			throws IOException, InterruptedException {
 		AbstractBuild<?, ?> build = (AbstractBuild<?, ?>) run;
-		Excution excution = new Excution(requestBody);
+		Excution excution = new Excution();
 		excution.doScmWork(build, listener);
-		HttpExcusion httpExcusion = new HttpExcusion();
+		HttpExcution httpExcution = new HttpExcution();
 		EnvVars envVars = build.getEnvironment(listener);
-		for (Map.Entry<String, String> e : build.getBuildVariables().entrySet()) {
-			envVars.put(e.getKey(), e.getValue());
-		}
-		httpExcusion.from(this, envVars, run, listener);
-		HttpResponse response = httpExcusion.request();
+		httpExcution.from(this, envVars, run, listener);
+		HttpResponse response = httpExcution.request();
 	}
 
 	@Override
@@ -113,39 +108,8 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 			return HttpMode.getFillItems();
 		}
 
-		public ListBoxModel doFillAcceptTypeItems() {
-			return MimeType.getContentTypeFillItems();
-		}
-
 		public ListBoxModel doFillContentTypeItems() {
 			return MimeType.getContentTypeFillItems();
-		}
-
-		@Restricted(NoExternalUse.class) // Only for UI calls
-		public ListBoxModel doFillFormatItems() {
-			ListBoxModel items = new ListBoxModel();
-			for (FormatType formatType : FormatType.values()) {
-				items.add(formatType.getFormat(), formatType.name());
-			}
-			return items;
-		}
-
-		@Restricted(NoExternalUse.class) // Only for UI calls
-		public ListBoxModel doFillMatchingItems() {
-			ListBoxModel items = new ListBoxModel();
-			for (MatchingType matchingType : MatchingType.values()) {
-				items.add(matchingType.getMatching(), matchingType.name());
-			}
-			return items;
-		}
-
-		@Restricted(NoExternalUse.class) // Only for UI calls
-		public ListBoxModel doFillSinceItems() {
-			ListBoxModel items = new ListBoxModel();
-			for (SinceType sinceType : SinceType.values()) {
-				items.add(sinceType.getName(), sinceType.name());
-			}
-			return items;
 		}
 
 		public FormValidation doCheckValidResponseCodes(@QueryParameter String value) {
