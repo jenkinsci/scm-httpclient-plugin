@@ -25,11 +25,11 @@ public class Excution {
 		this.requestBody = requestBody;
 	}
 
-	public void doScmWork(Run<?, ?> run,TaskListener listener) {
+	public void doScmWork(AbstractBuild<?,?> build,TaskListener listener) {
 		try {
-			if (isScmChange(run)) {
+			if (isScmChange(build)) {
 				listener.getLogger().println("the scm has changed...");
-				Collection<String> affectedPaths = getAffectedPaths(run);
+				Collection<String> affectedPaths = getAffectedPaths(build);
 				Iterator<String> it = affectedPaths.iterator();
 				while (it.hasNext()) {
 					String path = (String) it.next();

@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -22,12 +20,11 @@ import com.meowlomo.jenkins.ci.util.HttpRequestNameValuePair;
 import com.meowlomo.jenkins.ci.util.RequestAction;
 
 import hudson.EnvVars;
-import hudson.model.AbstractBuild;
+import hudson.model.Run;
 import hudson.model.TaskListener;
 
 public class HttpExcusion {
 
-	private Map<String, String> variables = new HashMap<String, String>();
 	private String url;
 	private HttpMode httpMode;
 	private String body;
@@ -35,10 +32,15 @@ public class HttpExcusion {
 	private List<HttpRequestNameValuePair> headers;
 	private String validResponseCodes;
 	private String validResponseContent;
+
 	private transient PrintStream localLogger;
 
-	private HttpExcusion(String url, HttpMode httpMode, String body, MimeType contentType, List<HttpRequestNameValuePair> headers,
-			String validResponseCodes, String validResponseContent, Map<String, String> variables) {
+	public HttpExcusion() {
+
+	}
+
+	private HttpExcusion(String url, HttpMode httpMode, String body, MimeType contentType,
+			List<HttpRequestNameValuePair> headers, String validResponseCodes, String validResponseContent) {
 		this.url = url;
 		this.httpMode = httpMode;
 		this.body = body;
@@ -46,30 +48,38 @@ public class HttpExcusion {
 		this.headers = headers;
 		this.validResponseCodes = validResponseCodes;
 		this.validResponseContent = validResponseContent != null ? validResponseContent : "";
-		this.variables = variables;
 	}
 
-	public void request(AbstractBuild<?, ?> build, TaskListener taskListener) {
+	public HttpExcusion from(ScmHttpClient shc, EnvVars envVars, Run<?, ?> run, TaskListener taskListener) {
+		this.url = shc.getUrl();
+		this.httpMode = shc.getHttpMode();
+		this.body = shc.getRequestBody();
+		this.contentType = shc.getContentType();
+		this.validResponseCodes = shc.getValidResponseCodes();
+		this.validResponseContent = shc.getValidResponseContent();
+		List<HttpRequestNameValuePair> headers = resolveHeaders(envVars);
+		HttpExcusion httpExcusion = new HttpExcusion(url, httpMode, body, contentType, headers, validResponseCodes,
+				validResponseContent);
+		this.headers = headers;
+		localLogger = taskListener.getLogger();
+		return httpExcusion;
+	}
+
+	public HttpResponse request() {
+		System.out.println("print now > ");
+		System.out.println(url.toString() + "?" + httpMode + "?" + body + "?" + headers.get(0));
 		try {
-			CloseableHttpClient httpclient = null;
-			EnvVars envVars = build.getEnvironment(taskListener);
-			for (Map.Entry<String, String> e : build.getBuildVariables().entrySet()) {
-				envVars.put(e.getKey(), e.getValue());
-				System.out.println("e.getKey()" + e.getKey() + "e.getValue()" + e.getValue());
-			}
-			List<HttpRequestNameValuePair> headers = resolveHeaders(envVars);
-
 			HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+			CloseableHttpClient httpclient = clientBuilder.build();
 			HttpClientUtil clientUtil = new HttpClientUtil();
-			HttpRequestBase httpRequestBase = clientUtil.createRequestBase(
-					new RequestAction(new URL(url), httpMode, body, null, headers));
+			HttpRequestBase httpRequestBase = clientUtil
+					.createRequestBase(new RequestAction(new URL(url), httpMode, body, null, headers));
 			HttpContext context = new BasicHttpContext();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
+			HttpResponse response = executeRequest(httpclient, clientUtil, httpRequestBase, context);
+			return response;
+		} catch (IOException | InterruptedException e) {
+			throw new IllegalStateException(e);
 		}
-
 	}
 
 	List<HttpRequestNameValuePair> resolveHeaders(EnvVars envVars) {
@@ -79,24 +89,18 @@ public class HttpExcusion {
 		}
 		return headers;
 	}
-	private HttpResponse executeRequest(CloseableHttpClient httpclient, HttpClientUtil clientUtil, HttpRequestBase httpRequestBase, HttpContext context)
-			throws IOException, InterruptedException {
+
+	private HttpResponse executeRequest(CloseableHttpClient httpclient, HttpClientUtil clientUtil,
+			HttpRequestBase httpRequestBase, HttpContext context) throws IOException, InterruptedException {
 		try {
-			final HttpResponse response = clientUtil.execute(httpclient, context, httpRequestBase, logger());
+			final HttpResponse response = clientUtil.execute(httpclient, context, httpRequestBase, localLogger);
 			return response;
-		}
-		finally {
+		} finally {
 
-				if (httpclient != null) {
-					httpclient.close();
-				}
+			if (httpclient != null) {
+				httpclient.close();
+			}
 		}
 
 	}
-
-	private PrintStream logger(TaskListener taskListener) {
-		localLogger = taskListener.getLogger();
-		return localLogger;
-	}
-
 }

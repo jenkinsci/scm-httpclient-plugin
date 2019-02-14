@@ -27,8 +27,6 @@ import org.apache.http.protocol.HttpContext;
 import com.google.common.base.Strings;
 import com.meowlomo.jenkins.ci.constant.HttpMode;
 
-
-
 public class HttpClientUtil {
 	public HttpRequestBase createRequestBase(RequestAction requestAction) throws IOException {
         HttpRequestBase httpRequestBase = doCreateRequestBase(requestAction);

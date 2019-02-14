@@ -11,6 +11,7 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import org.apache.http.HttpResponse;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -25,9 +26,11 @@ import com.meowlomo.jenkins.ci.model.FormatType;
 import com.meowlomo.jenkins.ci.model.MatchingType;
 import com.meowlomo.jenkins.ci.model.SinceType;
 
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -77,24 +80,16 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	@Override
 	public void perform(Run<?, ?> run, FilePath workspace, Launcher launcher, TaskListener listener)
 			throws IOException, InterruptedException {
-		System.out.println("requestBody" + requestBody + "validResponseContent" + validResponseContent
-				+ "validResponseCodes" + validResponseCodes);
-		System.out
-				.println("contentType" + contentType + "acceptType" + acceptType + "httpMode" + httpMode + "url" + url);
-		// execute scm work
-		// ScmExcution se = new ScmExcution();
-		// se.from(this, build, workspace, launcher, listener, variables,
-		// printChangeLog);
-		//
-		// if (isSendHttpRequest()) {
-		// EnvVars envVars = build.getEnvironment(listener);
-		// HttpRequestExecution exec = HttpRequestExecution.from(this, envVars, build,
-		// listener, variables);
-		// launcher.getChannel().call(exec);
-		// }
-		// build.setResult(Result.SUCCESS);
+		AbstractBuild<?, ?> build = (AbstractBuild<?, ?>) run;
 		Excution excution = new Excution(requestBody);
-		excution.doScmWork(run,listener);
+		excution.doScmWork(build, listener);
+		HttpExcusion httpExcusion = new HttpExcusion();
+		EnvVars envVars = build.getEnvironment(listener);
+		for (Map.Entry<String, String> e : build.getBuildVariables().entrySet()) {
+			envVars.put(e.getKey(), e.getValue());
+		}
+		httpExcusion.from(this, envVars, run, listener);
+		HttpResponse response = httpExcusion.request();
 	}
 
 	@Override
