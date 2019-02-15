@@ -12,8 +12,6 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import org.apache.http.HttpResponse;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
@@ -22,7 +20,6 @@ import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 import com.meowlomo.jenkins.ci.constant.HttpMode;
 import com.meowlomo.jenkins.ci.constant.MimeType;
-import com.meowlomo.jenkins.ci.model.FormatType;
 
 import hudson.EnvVars;
 import hudson.Extension;
@@ -79,12 +76,19 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	public void perform(Run<?, ?> run, FilePath workspace, Launcher launcher, TaskListener listener)
 			throws IOException, InterruptedException {
 		AbstractBuild<?, ?> build = (AbstractBuild<?, ?>) run;
-		Excution excution = new Excution();
-		excution.doScmWork(build, listener);
-		HttpExcution httpExcution = new HttpExcution();
 		EnvVars envVars = build.getEnvironment(listener);
-		httpExcution.from(this, envVars, run, listener);
-		HttpResponse response = httpExcution.request();
+		// print all envs
+		for (java.util.Map.Entry<String, String> entry : envVars.entrySet()) {
+			listener.getLogger().println(entry.getKey()+entry.getValue());
+		}
+		ScmProcess excution = new ScmProcess();
+		excution.process(build, listener, envVars, variables);
+		if (sendHttpRequest) {
+			HttpExcution httpExcution = new HttpExcution();
+			httpExcution.from(this, envVars, run, listener);
+			HttpResponse response = httpExcution.request();
+		}
+
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package com.meowlomo.jenkins.ci.model;
+package com.meowlomo.jenkins.ci.constant;
 
 /**
  * Created by pestano on 20/03/16.
