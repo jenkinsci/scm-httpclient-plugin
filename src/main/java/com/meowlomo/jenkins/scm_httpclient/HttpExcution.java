@@ -1,8 +1,13 @@
 package com.meowlomo.jenkins.scm_httpclient;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,16 +19,22 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
+import com.google.common.collect.Range;
+import com.google.common.io.ByteStreams;
 import com.meowlomo.jenkins.scm_httpclient.constant.HttpMode;
 import com.meowlomo.jenkins.scm_httpclient.constant.MimeType;
+import com.meowlomo.jenkins.scm_httpclient.model.ResponseContentSupplier;
 import com.meowlomo.jenkins.scm_httpclient.util.HttpClientUtil;
 import com.meowlomo.jenkins.scm_httpclient.util.HttpRequestNameValuePair;
 import com.meowlomo.jenkins.scm_httpclient.util.RequestAction;
 import com.meowlomo.jenkins.scm_httpclient.util.UnescapeUtil;
 
+import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import com.meowlomo.jenkins.scm_httpclient.ScmHttpClient.DescriptorImpl;
+
 
 public class HttpExcution {
 
@@ -67,20 +78,21 @@ public class HttpExcution {
 		return httpExcusion;
 	}
 
-	public HttpResponse request() {
+	public ResponseContentSupplier request() {
 		try {
 			HttpClientBuilder clientBuilder = HttpClientBuilder.create();
 			CloseableHttpClient httpclient = clientBuilder.build();
 			HttpClientUtil clientUtil = new HttpClientUtil();
 			localLogger.println("URL:" + url);
 			localLogger.println("HttpMethod:" + httpMode);
-			if(!body.equals("") ) {
+			if (!body.equals("")) {
 				localLogger.println("RequestBody:" + body);
 			}
 			HttpRequestBase httpRequestBase = clientUtil
 					.createRequestBase(new RequestAction(new URL(url), httpMode, body, null, headers));
 			HttpContext context = new BasicHttpContext();
-			HttpResponse response = executeRequest(httpclient, clientUtil, httpRequestBase, context);
+			ResponseContentSupplier response = executeRequest(httpclient, clientUtil, httpRequestBase, context);
+			processResponse(response);
 			return response;
 		} catch (IOException | InterruptedException e) {
 			throw new IllegalStateException(e);
@@ -99,17 +111,49 @@ public class HttpExcution {
 		return UnescapeUtil.replaceSprcialString(requestBody, variables);
 	}
 
-	private HttpResponse executeRequest(CloseableHttpClient httpclient, HttpClientUtil clientUtil,
+	private ResponseContentSupplier executeRequest(CloseableHttpClient httpclient, HttpClientUtil clientUtil,
 			HttpRequestBase httpRequestBase, HttpContext context) throws IOException, InterruptedException {
+		ResponseContentSupplier responseContentSupplier;
 		try {
 			final HttpResponse response = clientUtil.execute(httpclient, context, httpRequestBase, localLogger);
-			return response;
-		} finally {
+			// The HttpEntity is consumed by the ResponseContentSupplier
+			responseContentSupplier = new ResponseContentSupplier(response);
+		} catch (UnknownHostException uhe) {
+			localLogger.println("Treating UnknownHostException(" + uhe.getMessage() + ") as 404 Not Found");
+			responseContentSupplier = new ResponseContentSupplier("UnknownHostException as 404 Not Found", 404);
+		} catch (SocketTimeoutException | ConnectException ce) {
+			localLogger.println("Treating " + ce.getClass() + "(" + ce.getMessage() + ") as 408 Request Timeout");
+			responseContentSupplier = new ResponseContentSupplier(
+					ce.getClass() + "(" + ce.getMessage() + ") as 408 Request Timeout", 408);
+		}
 
-			if (httpclient != null) {
-				httpclient.close();
+		return responseContentSupplier;
+	}
+
+	private void processResponse(ResponseContentSupplier response) throws IOException, InterruptedException {
+		// logs
+		localLogger.println("Response: \n" + response.getContent());
+
+		// validate status code
+		responseCodeIsValid(response);
+
+		// validate content
+		if (!validResponseContent.isEmpty()) {
+			if (!response.getContent().contains(validResponseContent)) {
+				throw new AbortException(
+						"Fail: Response doesn't contain expected content '" + validResponseContent + "'");
 			}
 		}
 
+	}
+	private void responseCodeIsValid(ResponseContentSupplier response) throws AbortException {
+		List<Range<Integer>> ranges = DescriptorImpl.parseToRange(validResponseCodes);
+		for (Range<Integer> range : ranges) {
+			if (range.contains(response.getStatus())) {
+				localLogger.println("Success code from " + range);
+				return;
+			}
+		}
+		throw new AbortException("Fail: the returned code " + response.getStatus() + " is not in the accepted range: " + ranges);
 	}
 }

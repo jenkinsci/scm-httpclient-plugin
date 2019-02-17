@@ -11,7 +11,6 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import org.apache.http.HttpResponse;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
@@ -20,6 +19,7 @@ import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 import com.meowlomo.jenkins.scm_httpclient.constant.HttpMode;
 import com.meowlomo.jenkins.scm_httpclient.constant.MimeType;
+import com.meowlomo.jenkins.scm_httpclient.model.ResponseContentSupplier;
 
 import hudson.EnvVars;
 import hudson.Extension;
@@ -84,7 +84,7 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 		if (sendHttpRequest) {
 			HttpExcution httpExcution = new HttpExcution();
 			httpExcution.from(this, envVars, run, listener);
-			HttpResponse response = httpExcution.request();
+			ResponseContentSupplier response = httpExcution.request();
 		}
 	}
 
@@ -95,6 +95,7 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 
 	@Extension
 	public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
+//		 public static final String   validResponseCodes        = "100:399";
 		@Override
 		public boolean isApplicable(Class<? extends AbstractProject> aClass) {
 			return true;
