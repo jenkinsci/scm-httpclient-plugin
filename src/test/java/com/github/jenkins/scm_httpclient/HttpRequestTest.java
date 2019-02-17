@@ -1,3 +1,4 @@
+package com.github.jenkins.scm_httpclient;
 //package com.github.jenkins.lastchanges;
 //
 //import java.net.ConnectException;

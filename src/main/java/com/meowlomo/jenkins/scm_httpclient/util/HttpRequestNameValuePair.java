@@ -1,4 +1,4 @@
-package com.meowlomo.jenkins.ci.util;
+package com.meowlomo.jenkins.scm_httpclient.util;
 
 import java.io.Serializable;
 

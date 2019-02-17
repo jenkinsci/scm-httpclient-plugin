@@ -1,4 +1,4 @@
-package com.meowlomo.jenkins.ci.util;
+package com.meowlomo.jenkins.scm_httpclient.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;

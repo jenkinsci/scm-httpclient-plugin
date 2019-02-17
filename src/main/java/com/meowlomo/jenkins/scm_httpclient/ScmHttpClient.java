@@ -18,8 +18,8 @@ import org.kohsuke.stapler.QueryParameter;
 
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
-import com.meowlomo.jenkins.ci.constant.HttpMode;
-import com.meowlomo.jenkins.ci.constant.MimeType;
+import com.meowlomo.jenkins.scm_httpclient.constant.HttpMode;
+import com.meowlomo.jenkins.scm_httpclient.constant.MimeType;
 
 import hudson.EnvVars;
 import hudson.Extension;

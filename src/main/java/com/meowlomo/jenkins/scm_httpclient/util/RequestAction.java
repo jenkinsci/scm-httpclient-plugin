@@ -1,4 +1,4 @@
-package com.meowlomo.jenkins.ci.util;
+package com.meowlomo.jenkins.scm_httpclient.util;
 
 import java.io.Serializable;
 import java.net.URL;
@@ -9,7 +9,7 @@ import java.util.List;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
-import com.meowlomo.jenkins.ci.constant.HttpMode;
+import com.meowlomo.jenkins.scm_httpclient.constant.HttpMode;
 
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;

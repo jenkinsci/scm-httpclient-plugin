@@ -1,4 +1,4 @@
-package com.meowlomo.jenkins.ci.constant;
+package com.meowlomo.jenkins.scm_httpclient.constant;
 
 import hudson.util.ListBoxModel;
 

@@ -1,3 +1,4 @@
+package com.meowlomo.jenkins.scm_httpclient.constant;
 //package com.meowlomo.jenkins.ci.constant;
 //
 //import java.util.Arrays;

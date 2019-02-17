@@ -14,12 +14,12 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
-import com.meowlomo.jenkins.ci.constant.HttpMode;
-import com.meowlomo.jenkins.ci.constant.MimeType;
-import com.meowlomo.jenkins.ci.util.HttpClientUtil;
-import com.meowlomo.jenkins.ci.util.HttpRequestNameValuePair;
-import com.meowlomo.jenkins.ci.util.RequestAction;
-import com.meowlomo.jenkins.ci.util.UnescapeUtil;
+import com.meowlomo.jenkins.scm_httpclient.constant.HttpMode;
+import com.meowlomo.jenkins.scm_httpclient.constant.MimeType;
+import com.meowlomo.jenkins.scm_httpclient.util.HttpClientUtil;
+import com.meowlomo.jenkins.scm_httpclient.util.HttpRequestNameValuePair;
+import com.meowlomo.jenkins.scm_httpclient.util.RequestAction;
+import com.meowlomo.jenkins.scm_httpclient.util.UnescapeUtil;
 
 import hudson.EnvVars;
 import hudson.model.Run;

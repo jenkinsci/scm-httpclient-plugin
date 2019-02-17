@@ -9,9 +9,9 @@ import java.util.Map;
 import java.util.Set;
 
 import com.alibaba.fastjson.JSON;
-import com.meowlomo.jenkins.ci.constant.ExcutionConstant;
-import com.meowlomo.jenkins.ci.model.CommitInfo;
-import com.meowlomo.jenkins.ci.model.JobBuildMessage;
+import com.meowlomo.jenkins.scm_httpclient.constant.ExcutionConstant;
+import com.meowlomo.jenkins.scm_httpclient.model.CommitInfo;
+import com.meowlomo.jenkins.scm_httpclient.model.JobBuildMessage;
 
 import hudson.EnvVars;
 import hudson.model.AbstractBuild;

@@ -1,4 +1,4 @@
-package com.meowlomo.jenkins.ci.constant;
+package com.meowlomo.jenkins.scm_httpclient.constant;
 
 /**
  * Created by pestano on 20/03/16.

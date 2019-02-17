@@ -1,4 +1,4 @@
-package com.meowlomo.jenkins.ci.model;
+package com.meowlomo.jenkins.scm_httpclient.model;
 
 import java.util.List;
 

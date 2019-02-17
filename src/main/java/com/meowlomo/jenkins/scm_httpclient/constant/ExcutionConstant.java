@@ -1,4 +1,4 @@
-package com.meowlomo.jenkins.ci.constant;
+package com.meowlomo.jenkins.scm_httpclient.constant;
 
 public class ExcutionConstant {
 	public final static String  AFFECTED_PATH =                      "AFFECTED_PATH";

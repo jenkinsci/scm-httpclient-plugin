@@ -1,4 +1,4 @@
-package com.meowlomo.jenkins.ci.util;
+package com.meowlomo.jenkins.scm_httpclient.util;
 
 import java.util.Map;
 import java.util.regex.Matcher;

@@ -1,4 +1,4 @@
-package com.meowlomo.jenkins.ci.util;
+package com.meowlomo.jenkins.scm_httpclient.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,7 +25,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.protocol.HttpContext;
 
 import com.google.common.base.Strings;
-import com.meowlomo.jenkins.ci.constant.HttpMode;
+import com.meowlomo.jenkins.scm_httpclient.constant.HttpMode;
 
 public class HttpClientUtil {
 	public HttpRequestBase createRequestBase(RequestAction requestAction) throws IOException {
