@@ -19,7 +19,7 @@ import hudson.model.TaskListener;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
 
-public class ScmProcess {
+public class ScmExcution {
 
 	public void process(AbstractBuild<?, ?> build, TaskListener listener, EnvVars envVars,
 			Map<String, String> variables) {

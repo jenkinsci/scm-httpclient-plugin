@@ -43,6 +43,9 @@ When you use Http Request function,the affectedPaths and job build message can b
 After building, you can see console message:
 ![](https://i.imgur.com/sPjADov.png)
 
+Tip: debug jenkins plugin
+mvn hpi:run -Dmaven.javadoc.skip=true -Djetty.port=8090 
+
 
 
 

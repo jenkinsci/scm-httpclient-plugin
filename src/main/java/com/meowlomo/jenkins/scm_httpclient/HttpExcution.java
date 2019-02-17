@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -18,6 +19,7 @@ import com.meowlomo.jenkins.ci.constant.MimeType;
 import com.meowlomo.jenkins.ci.util.HttpClientUtil;
 import com.meowlomo.jenkins.ci.util.HttpRequestNameValuePair;
 import com.meowlomo.jenkins.ci.util.RequestAction;
+import com.meowlomo.jenkins.ci.util.UnescapeUtil;
 
 import hudson.EnvVars;
 import hudson.model.Run;
@@ -53,7 +55,7 @@ public class HttpExcution {
 	public HttpExcution from(ScmHttpClient shc, EnvVars envVars, Run<?, ?> run, TaskListener taskListener) {
 		this.url = shc.getUrl();
 		this.httpMode = shc.getHttpMode();
-		this.body = shc.getRequestBody();
+		this.body = resolveBody(shc.getRequestBody(), shc.variables);
 		this.contentType = shc.getContentType();
 		this.validResponseCodes = shc.getValidResponseCodes();
 		this.validResponseContent = shc.getValidResponseContent();
@@ -70,8 +72,11 @@ public class HttpExcution {
 			HttpClientBuilder clientBuilder = HttpClientBuilder.create();
 			CloseableHttpClient httpclient = clientBuilder.build();
 			HttpClientUtil clientUtil = new HttpClientUtil();
-			localLogger.println("URL:"+url);
-			localLogger.println("HttpMethod:"+httpMode);
+			localLogger.println("URL:" + url);
+			localLogger.println("HttpMethod:" + httpMode);
+			if(!body.equals("") ) {
+				localLogger.println("RequestBody:" + body);
+			}
 			HttpRequestBase httpRequestBase = clientUtil
 					.createRequestBase(new RequestAction(new URL(url), httpMode, body, null, headers));
 			HttpContext context = new BasicHttpContext();
@@ -88,6 +93,10 @@ public class HttpExcution {
 			headers.add(new HttpRequestNameValuePair("Content-type", contentType.getContentType().toString()));
 		}
 		return headers;
+	}
+
+	private String resolveBody(String requestBody, Map<String, String> variables) {
+		return UnescapeUtil.replaceSprcialString(requestBody, variables);
 	}
 
 	private HttpResponse executeRequest(CloseableHttpClient httpclient, HttpClientUtil clientUtil,

@@ -57,8 +57,6 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 
 	private HttpMode httpMode;
 
-	private MimeType acceptType;
-
 	private MimeType contentType;
 
 	private String validResponseCodes;
@@ -81,14 +79,13 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 		for (java.util.Map.Entry<String, String> entry : envVars.entrySet()) {
 			listener.getLogger().println(entry.getKey()+entry.getValue());
 		}
-		ScmProcess excution = new ScmProcess();
+		ScmExcution excution = new ScmExcution();
 		excution.process(build, listener, envVars, variables);
 		if (sendHttpRequest) {
 			HttpExcution httpExcution = new HttpExcution();
 			httpExcution.from(this, envVars, run, listener);
 			HttpResponse response = httpExcution.request();
 		}
-
 	}
 
 	@Override
@@ -223,15 +220,6 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	@DataBoundSetter
 	public void setHttpMode(HttpMode httpMode) {
 		this.httpMode = httpMode;
-	}
-
-	public MimeType getAcceptType() {
-		return acceptType;
-	}
-
-	@DataBoundSetter
-	public void setAcceptType(MimeType acceptType) {
-		this.acceptType = acceptType;
 	}
 
 	public MimeType getContentType() {
