@@ -1,36 +1,21 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core"
-         xmlns:f="/lib/form">
-   <f:entry title="Print changeLog" field="printChangeLog"
-                 description="check if print changeLog diff between last and previous build on console.">
-            <f:checkbox />
-   </f:entry>
-  
-  <f:advanced>
-	  <f:entry title="Handle affectedPaths" field="handleAffectedPaths"
-	                 description="check if handle scm affectedPaths by 'cut' or 'contain'.">
-	            <f:checkbox />
-	  </f:entry>
-	  <f:entry field="cut" title="Cut" description="cutting a part of affectedPath by input.">
-	        <f:textbox />
-	  </f:entry>
-	  <f:entry field="contain" title="Contain"  description="check if the affectPath contains input.if true,the input will replace affectedpath.">
-	        <f:textbox />
-	  </f:entry>
-  </f:advanced>
-            
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+  <f:section title="Regular Expression">
+     <f:entry title="Regex string" field="regexString">
+	    <f:textbox />
+	 </f:entry>
+	 <f:entry title="Replace all" field="replaceAll">
+	    <f:textbox />
+	 </f:entry>
+  </f:section>   
   <f:section title="Http Request">
-     <f:entry title="Send httpRequest" field="sendHttpRequest"
-                 description="check if send http request.">
-            <f:checkbox />
+     <f:entry title="Send httpRequest" field="sendHttpRequest" description="check if send http request.">
+        <f:checkbox />
     </f:entry>
   	<f:entry field="url" title="URL">
         <f:textbox />
     </f:entry>
     <f:entry field="httpMode" title="HTTP mode">
-        <f:select />
-    </f:entry>
-    <f:entry field="acceptType" title="Accept">
         <f:select />
     </f:entry>
     <f:entry field="contentType" title="Content-type">
@@ -39,15 +24,15 @@
     <f:entry field="requestBody" title="Request body">
         <f:textarea />
     </f:entry>
- </f:section>
- <f:section title="Response">    
-            <f:entry field="validResponseCodes" title="Response codes expected">
-                <f:textbox default="${descriptor.validResponseCodes}"/>
-            </f:entry>
-            <f:entry field="validResponseContent" title="Response content expected">
-                <f:textbox />
-            </f:entry>
-        </f:section>
+  </f:section>
+  <f:section title="Response">    
+    <f:entry field="validResponseCodes" title="Response codes expected">
+        <f:textbox default="${descriptor.validResponseCodes}"/>
+    </f:entry>
+    <f:entry field="validResponseContent" title="Response content expected">
+        <f:textbox />
+    </f:entry>
+  </f:section>
 </j:jelly>
 
 

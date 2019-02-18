@@ -43,14 +43,10 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 
 	Map<String, String> variables = new HashMap<String, String>();
 
-	private boolean printChangeLog;
-
-	private boolean handleAffectedPaths;
-
-	private String cut;
-
-	private String contain;
-
+	private String regexString;
+	
+	private String replaceAll;
+	
 	private boolean sendHttpRequest;
 
 	private @Nonnull String url;
@@ -173,45 +169,9 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 		this.sendHttpRequest = sendHttpRequest;
 	}
 
-	public boolean isPrintChangeLog() {
-		return printChangeLog;
-	}
-
-	@DataBoundSetter
-	public void setPrintChangeLog(Boolean printChangeLog) {
-		this.printChangeLog = printChangeLog;
-	}
-
 	@Nonnull
 	public String getUrl() {
 		return url;
-	}
-
-	public boolean isHandleAffectedPaths() {
-		return handleAffectedPaths;
-	}
-
-	@DataBoundSetter
-	public void setHandleAffectedPaths(boolean handleAffectedPaths) {
-		this.handleAffectedPaths = handleAffectedPaths;
-	}
-
-	public String getCut() {
-		return cut;
-	}
-
-	@DataBoundSetter
-	public void setCut(String cut) {
-		this.cut = cut;
-	}
-
-	public String getContain() {
-		return contain;
-	}
-
-	@DataBoundSetter
-	public void setContain(String contain) {
-		this.contain = contain;
 	}
 
 	public HttpMode getHttpMode() {
@@ -230,6 +190,24 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	@DataBoundSetter
 	public void setContentType(MimeType contentType) {
 		this.contentType = contentType;
+	}
+	
+	public String getRegexString() {
+		return regexString;
+	}
+
+	@DataBoundSetter
+	public void setRegexString(String regexString) {
+		this.regexString = regexString;
+	}
+	
+	public String getReplaceAll() {
+		return replaceAll;
+	}
+
+	@DataBoundSetter
+	public void setReplaceAll(String replaceAll) {
+		this.replaceAll = replaceAll;
 	}
 
 	public String getRequestBody() {
