@@ -19,7 +19,8 @@ import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 import com.meowlomo.jenkins.scm_httpclient.constant.HttpMode;
 import com.meowlomo.jenkins.scm_httpclient.constant.MimeType;
-import com.meowlomo.jenkins.scm_httpclient.model.ResponseContentSupplier;
+import com.meowlomo.jenkins.scm_httpclient.util.HttpRequestNameValuePair;
+import com.meowlomo.jenkins.scm_httpclient.util.UnescapeUtil;
 
 import hudson.EnvVars;
 import hudson.Extension;
@@ -44,9 +45,7 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	Map<String, String> variables = new HashMap<String, String>();
 
 	private String regexString;
-	
-	private String replaceAll;
-	
+
 	private boolean sendHttpRequest;
 
 	private @Nonnull String url;
@@ -70,20 +69,9 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	public void perform(Run<?, ?> run, FilePath workspace, Launcher launcher, TaskListener listener)
 			throws IOException, InterruptedException {
 		AbstractBuild<?, ?> build = (AbstractBuild<?, ?>) run;
-		EnvVars envVars = build.getEnvironment(listener);
-		// print all envs
-		for (java.util.Map.Entry<String, String> entry : envVars.entrySet()) {
-			listener.getLogger().println(entry.getKey()+entry.getValue());
-		}
-		ScmExcution excution = new ScmExcution();
-		excution.process(build, listener, envVars, variables);
-		if (sendHttpRequest) {
-			HttpExcution httpExcution = new HttpExcution();
-			httpExcution.from(this, envVars, run, listener);
-			ResponseContentSupplier response = httpExcution.request();
-		}
+		ScmHttpRequestExcution scmHttpRequestExcution = ScmHttpRequestExcution.from(this, build, listener);
+		scmHttpRequestExcution.process(variables);
 	}
-
 	@Override
 	public BuildStepMonitor getRequiredMonitorService() {
 		return BuildStepMonitor.NONE;
@@ -91,7 +79,7 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 
 	@Extension
 	public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
-//		 public static final String   validResponseCodes        = "100:399";
+		// public static final String validResponseCodes = "100:399";
 		@Override
 		public boolean isApplicable(Class<? extends AbstractProject> aClass) {
 			return true;
@@ -150,14 +138,23 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 						throw new IllegalArgumentException("Invalid number " + fromTo[1]);
 					}
 				}
-
 				checkArgument(from <= to, "Interval %s should be FROM less than TO", code);
 				validRanges.add(Ranges.closed(from, to));
 			}
-
 			return validRanges;
 		}
+	}
+	
+	List<HttpRequestNameValuePair> resolveHeaders(EnvVars envVars) {
+		final List<HttpRequestNameValuePair> headers = new ArrayList<>();
+		if (contentType != null && contentType != MimeType.NOT_SET) {
+			headers.add(new HttpRequestNameValuePair("Content-type", contentType.getContentType().toString()));
+		}
+		return headers;
+	}
 
+	public String resolveBody() {
+		return UnescapeUtil.replaceSprcialString(requestBody, variables);
 	}
 
 	public boolean isSendHttpRequest() {
@@ -191,7 +188,7 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	public void setContentType(MimeType contentType) {
 		this.contentType = contentType;
 	}
-	
+
 	public String getRegexString() {
 		return regexString;
 	}
@@ -199,15 +196,6 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	@DataBoundSetter
 	public void setRegexString(String regexString) {
 		this.regexString = regexString;
-	}
-	
-	public String getReplaceAll() {
-		return replaceAll;
-	}
-
-	@DataBoundSetter
-	public void setReplaceAll(String replaceAll) {
-		this.replaceAll = replaceAll;
 	}
 
 	public String getRequestBody() {

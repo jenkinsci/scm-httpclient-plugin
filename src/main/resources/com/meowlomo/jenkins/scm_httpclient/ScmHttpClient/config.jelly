@@ -4,10 +4,7 @@
      <f:entry title="Regex string" field="regexString">
 	    <f:textbox />
 	 </f:entry>
-	 <f:entry title="Replace all" field="replaceAll">
-	    <f:textbox />
-	 </f:entry>
-  </f:section>   
+  </f:section>
   <f:section title="Http Request">
      <f:entry title="Send httpRequest" field="sendHttpRequest" description="check if send http request.">
         <f:checkbox />
