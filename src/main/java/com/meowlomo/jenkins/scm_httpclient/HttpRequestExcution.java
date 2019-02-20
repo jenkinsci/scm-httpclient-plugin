@@ -35,8 +35,7 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import com.meowlomo.jenkins.scm_httpclient.ScmHttpClient.DescriptorImpl;
 
-
-public class HttpExcution {
+public class HttpRequestExcution {
 
 	private String url;
 	private HttpMode httpMode;
@@ -48,11 +47,11 @@ public class HttpExcution {
 
 	private transient PrintStream localLogger;
 
-	public HttpExcution() {
+	public HttpRequestExcution() {
 
 	}
 
-	private HttpExcution(String url, HttpMode httpMode, String body, MimeType contentType,
+	private HttpRequestExcution(String url, HttpMode httpMode, String body, MimeType contentType,
 			List<HttpRequestNameValuePair> headers, String validResponseCodes, String validResponseContent) {
 		this.url = url;
 		this.httpMode = httpMode;
@@ -63,7 +62,7 @@ public class HttpExcution {
 		this.validResponseContent = validResponseContent != null ? validResponseContent : "";
 	}
 
-	public HttpExcution from(ScmHttpClient shc, EnvVars envVars, Run<?, ?> run, TaskListener taskListener) {
+	public HttpRequestExcution from(ScmHttpClient shc, EnvVars envVars, Run<?, ?> run, TaskListener taskListener) {
 		this.url = shc.getUrl();
 		this.httpMode = shc.getHttpMode();
 		this.body = resolveBody(shc.getRequestBody(), shc.variables);
@@ -71,8 +70,8 @@ public class HttpExcution {
 		this.validResponseCodes = shc.getValidResponseCodes();
 		this.validResponseContent = shc.getValidResponseContent();
 		List<HttpRequestNameValuePair> headers = resolveHeaders(envVars);
-		HttpExcution httpExcusion = new HttpExcution(url, httpMode, body, contentType, headers, validResponseCodes,
-				validResponseContent);
+		HttpRequestExcution httpExcusion = new HttpRequestExcution(url, httpMode, body, contentType, headers,
+				validResponseCodes, validResponseContent);
 		this.headers = headers;
 		localLogger = taskListener.getLogger();
 		return httpExcusion;
@@ -146,6 +145,7 @@ public class HttpExcution {
 		}
 
 	}
+
 	private void responseCodeIsValid(ResponseContentSupplier response) throws AbortException {
 		List<Range<Integer>> ranges = DescriptorImpl.parseToRange(validResponseCodes);
 		for (Range<Integer> range : ranges) {
@@ -154,6 +154,7 @@ public class HttpExcution {
 				return;
 			}
 		}
-		throw new AbortException("Fail: the returned code " + response.getStatus() + " is not in the accepted range: " + ranges);
+		throw new AbortException(
+				"Fail: the returned code " + response.getStatus() + " is not in the accepted range: " + ranges);
 	}
 }

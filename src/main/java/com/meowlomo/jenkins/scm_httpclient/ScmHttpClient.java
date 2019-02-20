@@ -19,6 +19,7 @@ import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 import com.meowlomo.jenkins.scm_httpclient.constant.HttpMode;
 import com.meowlomo.jenkins.scm_httpclient.constant.MimeType;
+import com.meowlomo.jenkins.scm_httpclient.model.ResponseContentSupplier;
 import com.meowlomo.jenkins.scm_httpclient.util.HttpRequestNameValuePair;
 import com.meowlomo.jenkins.scm_httpclient.util.UnescapeUtil;
 
@@ -69,9 +70,17 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	public void perform(Run<?, ?> run, FilePath workspace, Launcher launcher, TaskListener listener)
 			throws IOException, InterruptedException {
 		AbstractBuild<?, ?> build = (AbstractBuild<?, ?>) run;
-		ScmHttpRequestExcution scmHttpRequestExcution = ScmHttpRequestExcution.from(this, build, listener);
-		scmHttpRequestExcution.process(variables);
+		EnvVars envVars = build.getEnvironment(listener);
+		ScmExcution scmExcution = new ScmExcution(regexString, build, listener, envVars);
+		scmExcution.process(variables);
+
+		if (sendHttpRequest) {
+			HttpRequestExcution httpRequestExcution = new HttpRequestExcution();
+			httpRequestExcution.from(this, envVars, run, listener);
+			ResponseContentSupplier response = httpRequestExcution.request();
+		}
 	}
+
 	@Override
 	public BuildStepMonitor getRequiredMonitorService() {
 		return BuildStepMonitor.NONE;
@@ -117,7 +126,6 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 
 		public static List<Range<Integer>> parseToRange(String value) {
 			List<Range<Integer>> validRanges = new ArrayList<Range<Integer>>();
-			System.out.println("parseToRange > value:" + value);
 			String[] codes = value.split(",");
 			for (String code : codes) {
 				String[] fromTo = code.trim().split(":");
@@ -144,7 +152,7 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 			return validRanges;
 		}
 	}
-	
+
 	List<HttpRequestNameValuePair> resolveHeaders(EnvVars envVars) {
 		final List<HttpRequestNameValuePair> headers = new ArrayList<>();
 		if (contentType != null && contentType != MimeType.NOT_SET) {
