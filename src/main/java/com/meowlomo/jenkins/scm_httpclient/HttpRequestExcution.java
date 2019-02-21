@@ -1,8 +1,6 @@
 package com.meowlomo.jenkins.scm_httpclient;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
@@ -20,7 +18,7 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
 import com.google.common.collect.Range;
-import com.google.common.io.ByteStreams;
+import com.meowlomo.jenkins.scm_httpclient.ScmHttpClient.DescriptorImpl;
 import com.meowlomo.jenkins.scm_httpclient.constant.HttpMode;
 import com.meowlomo.jenkins.scm_httpclient.constant.MimeType;
 import com.meowlomo.jenkins.scm_httpclient.model.ResponseContentSupplier;
@@ -33,7 +31,6 @@ import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import com.meowlomo.jenkins.scm_httpclient.ScmHttpClient.DescriptorImpl;
 
 public class HttpRequestExcution {
 
@@ -131,7 +128,7 @@ public class HttpRequestExcution {
 
 	private void processResponse(ResponseContentSupplier response) throws IOException, InterruptedException {
 		// logs
-		localLogger.println("Response: \n" + response.getContent());
+//		localLogger.println("Response: \n" + response.getContent());
 
 		// validate status code
 		responseCodeIsValid(response);

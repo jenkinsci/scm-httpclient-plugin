@@ -1,5 +1,11 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+  <f:entry title="Save AFFECTED_PATH" field="saveAffectedPath">
+        <f:checkbox />
+  </f:entry>
+  <f:entry title="Save JOB_BUILD_MESSAGE" field="saveJobBuildMessage">
+        <f:checkbox />
+  </f:entry>
   <f:section title="Regular Expression">
      <f:entry title="Regex string" field="regexString">
 	    <f:textbox />
@@ -26,9 +32,10 @@
     <f:entry field="validResponseCodes" title="Response codes expected">
         <f:textbox default="${descriptor.validResponseCodes}"/>
     </f:entry>
-    <f:entry field="validResponseContent" title="Response content expected">
+   <!-- <f:entry field="validResponseContent" title="Response content expected">
         <f:textbox />
     </f:entry>
+    -->
   </f:section>
 </j:jelly>
 

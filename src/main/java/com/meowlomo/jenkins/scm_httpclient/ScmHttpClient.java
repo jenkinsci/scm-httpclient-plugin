@@ -3,6 +3,7 @@ package com.meowlomo.jenkins.scm_httpclient;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +20,8 @@ import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 import com.meowlomo.jenkins.scm_httpclient.constant.HttpMode;
 import com.meowlomo.jenkins.scm_httpclient.constant.MimeType;
-import com.meowlomo.jenkins.scm_httpclient.model.ResponseContentSupplier;
+import com.meowlomo.jenkins.scm_httpclient.model.CommitInfo;
+import com.meowlomo.jenkins.scm_httpclient.model.JobBuildMessage;
 import com.meowlomo.jenkins.scm_httpclient.util.HttpRequestNameValuePair;
 import com.meowlomo.jenkins.scm_httpclient.util.UnescapeUtil;
 
@@ -44,6 +46,10 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	private static final long serialVersionUID = 1L;
 
 	Map<String, String> variables = new HashMap<String, String>();
+
+	private boolean saveAffectedPath;
+
+	private boolean saveJobBuildMessage;
 
 	private String regexString;
 
@@ -71,13 +77,29 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 			throws IOException, InterruptedException {
 		AbstractBuild<?, ?> build = (AbstractBuild<?, ?>) run;
 		EnvVars envVars = build.getEnvironment(listener);
-		ScmExcution scmExcution = new ScmExcution(regexString, build, listener, envVars);
-		scmExcution.process(variables);
+		PrintStream logger = listener.getLogger();
+		if (!build.getChangeSets().isEmpty()) {
+			logger.println("the scm has changed...");
+
+			CommitInfo commitInfo = new CommitInfo();
+			if (saveAffectedPath) {
+				commitInfo.doSaveAffectedPathsWork(regexString, build.getChangeSets(), logger, variables);
+			}
+
+			JobBuildMessage jobBuildMessage = new JobBuildMessage();
+			if (saveJobBuildMessage) {
+				jobBuildMessage.doSaveJobBuildMessageWork(envVars, commitInfo.getCommitInfos(build.getChangeSets()),
+						variables);
+			}
+
+		} else {
+			logger.println("the scm hasn't changed.");
+		}
 
 		if (sendHttpRequest) {
 			HttpRequestExcution httpRequestExcution = new HttpRequestExcution();
 			httpRequestExcution.from(this, envVars, run, listener);
-			ResponseContentSupplier response = httpRequestExcution.request();
+			httpRequestExcution.request();
 		}
 	}
 
@@ -88,9 +110,10 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 
 	@Extension
 	public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
-		// public static final String validResponseCodes = "100:399";
+		public static final String validResponseCodes = "100:399";
+
 		@Override
-		public boolean isApplicable(Class<? extends AbstractProject> aClass) {
+		public boolean isApplicable(@SuppressWarnings("rawtypes") Class<? extends AbstractProject> aClass) {
 			return true;
 		}
 
@@ -172,6 +195,24 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	@DataBoundSetter
 	public void setSendHttpRequest(Boolean sendHttpRequest) {
 		this.sendHttpRequest = sendHttpRequest;
+	}
+
+	public boolean isSaveAffectedPath() {
+		return saveAffectedPath;
+	}
+
+	@DataBoundSetter
+	public void setSaveAffectedPath(Boolean saveAffectedPath) {
+		this.saveAffectedPath = saveAffectedPath;
+	}
+
+	public boolean isSaveJobBuildMessage() {
+		return saveJobBuildMessage;
+	}
+
+	@DataBoundSetter
+	public void setSaveJobBuildMessage(Boolean saveJobBuildMessage) {
+		this.saveJobBuildMessage = saveJobBuildMessage;
 	}
 
 	@Nonnull

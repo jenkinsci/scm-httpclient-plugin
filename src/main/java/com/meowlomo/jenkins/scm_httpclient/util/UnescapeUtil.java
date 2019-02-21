@@ -6,17 +6,14 @@ import java.util.regex.Pattern;
 
 public class UnescapeUtil {
 
-	/** eg: String text = "saasa$(a)xxxxx$(b)"; 
-	        Map<String, String> variables = new HashMap<String,String>();
-	        variables.put("a", "35");
-	        variables.put("b", "36");
+	// eg: String text = "saasa$(a)xxxxx$(b)"; 
+	//        Map<String, String> variables = new HashMap<String,String>();
+	//        variables.put("a", "35");
+	//        variables.put("b", "36");
 	        
-		After function handled,the result returns saasa35xxxxx36
-	 * */
+	//	After function handled,the result returns saasa35xxxxx36
+
 	public static String replaceSprcialString(String text, Map<String, String> variables) {
-		if (text.equals("") || text == null) {
-			return "";
-		}
 		if (variables == null) {
 			return text;
 		}
