@@ -15,19 +15,62 @@
         <jenkins.version>2.7.3</jenkins.version>
         <java.level>7</java.level>
     </properties>
-    <name>SCM HttpClient Plugin</name>
-    <description>get scm affectPath to trigger service calls</description>
+
+    <name>SCM HttpClient</name>
+    <description>stored the scm changes and job build message as http request body to trigger service.</description>
+
     <licenses>
         <license>
             <name>MIT License</name>
             <url>https://opensource.org/licenses/MIT</url>
         </license>
     </licenses>
+
     <scm>
-        <connection>scm:git:git://github.com/jenkinsci/scm-httpclient-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:jenkinsci/scm-httpclient-plugin.git</developerConnection>
-        <url>https://github.com/jenkinsci/scm-httpclient-plugin</url>
+        <connection>scm:git:git://github.com:meowlomo/scm-httpclient-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:meowlomo/scm-httpclient-plugin.git</developerConnection>
+        <url>https://github.com/meowlomo/scm-httpclient-plugin.git</url>
     </scm>
+
+    <developers>
+        <developer>
+            <id>meowlomo</id>
+            <name>Rich</name>
+            <email>dev.support@meowlomo.com</email>
+        </developer>
+    </developers>
+    <dependencies>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>scm-api</artifactId>
+            <version>2.0.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>git</artifactId>
+            <version>2.3.5</version>
+        </dependency>
+        
+        <dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>apache-httpcomponents-client-4-api</artifactId>
+			<version>4.5.3-2.0</version>
+		</dependency>
+        
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+		<dependency>
+		    <groupId>com.alibaba</groupId>
+		    <artifactId>fastjson</artifactId>
+		    <version>1.2.47</version>
+		</dependency>
+
+    </dependencies>
+
     <repositories>
         <repository>
             <id>repo.jenkins-ci.org</id>
@@ -40,14 +83,5 @@
             <url>https://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
     </pluginRepositories>
-    
-    <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
-	<dependencies>
-		<dependency>
-		    <groupId>org.apache.httpcomponents</groupId>
-		    <artifactId>httpclient</artifactId>
-		    <version>4.5.6</version>
-		</dependency>
-	</dependencies>
-    
+
 </project>

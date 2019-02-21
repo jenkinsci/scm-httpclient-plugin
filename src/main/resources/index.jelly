@@ -1,4 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-    TODO
+  This plugin reads the job build message which is used to trigger other service. 
 </div>
