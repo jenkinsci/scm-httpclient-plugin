@@ -1,21 +1,30 @@
-##SCM HttpClient Plugin
+# SCM HttpClient Plugin
 
-  * Introduction
-  * How it works?
-  
-#Introduction
+   * Introduction
+   * How it works?
+   * Usage
+
+## Introduction
 
 The simple way to read the job build message, including the scm changeSets and job build message, which is used to trigger other service.
 
-    Only Git and Svn based projects are supported.
-
-#How it works?
-   While your job runs the plugin reads your build workspace to retrieve the  build message via compare last with previous build SCM revision diffs. the diff are stored and use like $(AFFECTED_PATH), $(JOB_BUILD_MESSAGE).
+   ***Only `Git` and `Svn` based projects are supported.***
    
-   
-Tip: debug jenkins plugin
-mvn hpi:run -Dmaven.javadoc.skip=true -Djetty.port=8090 
+## How it works? 
+
+While your job runs the plugin reads your build workspace to retrieve the build message via compare last with previous build SCM revision diffs. the diff are stored and use like $(AFFECTED_PATH), $(JOB_BUILD_MESSAGE).
+
+## Usage
+After installation just activate the post build action named SCM HttpClient.
+
+configuration:
+![](http://config.jpg)
+
+console:
+![](http://console.jpg)
 
 
+### Tip: debug jenkins plugin 
 
-
+```
+mvn hpi:run -Dmaven.javadoc.skip=true -Djetty.port=8090
