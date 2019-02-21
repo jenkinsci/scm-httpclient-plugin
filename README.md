@@ -18,10 +18,12 @@ While your job runs the plugin reads your build workspace to retrieve the build 
 After installation just activate the post build action named SCM HttpClient.
 
 configuration:
-![](http://config.jpg)
 
-console:
-![](http://console.jpg)
+![](https://i.imgur.com/N4MjwgH.jpg)
+
+print on console:
+
+![](https://i.imgur.com/RpWgbJR.jpg)
 
 
 ### Tip: debug jenkins plugin 
