@@ -134,12 +134,12 @@ public class HttpRequestExcution {
 		responseCodeIsValid(response);
 
 		// validate content
-		if (!validResponseContent.isEmpty()) {
-			if (!response.getContent().contains(validResponseContent)) {
-				throw new AbortException(
-						"Fail: Response doesn't contain expected content '" + validResponseContent + "'");
-			}
-		}
+//		if (!validResponseContent.isEmpty()) {
+//			if (!response.getContent().contains(validResponseContent)) {
+//				throw new AbortException(
+//						"Fail: Response doesn't contain expected content '" + validResponseContent + "'");
+//			}
+//		}
 
 	}
 
