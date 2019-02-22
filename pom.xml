@@ -8,7 +8,7 @@
         <relativePath />
     </parent>
     <groupId>com.meowlomo.jenkins</groupId>
-    <artifactId>scm-httpclient-plugin</artifactId>
+    <artifactId>scm-httpclient</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <properties>
