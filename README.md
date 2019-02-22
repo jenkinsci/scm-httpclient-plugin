@@ -19,11 +19,11 @@ After installation just activate the post build action named SCM HttpClient.
 
 configuration:
 
-![](https://i.imgur.com/N4MjwgH.jpg)
+![](https://i.imgur.com/4s3LJYC.jpg)
 
 print on console:
 
-![](https://i.imgur.com/RpWgbJR.jpg)
+![](https://i.imgur.com/BbHqhaK.jpg)
 
 
 ### Tip: debug jenkins plugin 
