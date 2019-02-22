@@ -93,26 +93,7 @@ public class CommitInfo {
 					}
 				}
 			}
-
-			Set<List<String>> mutil_affected_path = new HashSet<List<String>>();
-			// add scm path
-			if (!addScmPath.equals("")) {
-				List<String> result = Arrays.asList(addScmPath.split(","));
-				for (String affectedpath : allAffectedPaths) {
-					List<String> temp = new ArrayList<String>();
-					temp.addAll(result);
-					temp.add(affectedpath);
-					mutil_affected_path.add(temp);
-				}
-			} else {
-				for (String affectedpath : allAffectedPaths) {
-					List<String> temp = new ArrayList<String>();
-					temp.add(affectedpath);
-					mutil_affected_path.add(temp);
-				}
-
-			}
-			saveAffectedPathsToJson(mutil_affected_path, variables);
+			saveAffectedPathsToJson(AddscmPathHandle(addScmPath, allAffectedPaths, logger), variables);
 		}
 	}
 
@@ -121,6 +102,31 @@ public class CommitInfo {
 			String AFFECTED_PATH = JSON.toJSONString(mutil_affected_path);
 			variables.put(ExcutionConstant.AFFECTED_PATH, AFFECTED_PATH);
 		}
+	}
+
+	private Set<List<String>> AddscmPathHandle(String addScmPath, Set<String> allAffectedPaths, PrintStream logger) {
+		if (allAffectedPaths.isEmpty()) {
+			logger.println("[ERROR]the scm affected path is empty.");
+			return null;
+		}
+		Set<List<String>> mutil_affected_path = new HashSet<List<String>>();
+		if (!addScmPath.equals("")) {
+			List<String> result = Arrays.asList(addScmPath.split(","));
+			for (String affectedpath : allAffectedPaths) {
+				List<String> temp = new ArrayList<String>();
+				temp.addAll(result);
+				temp.add(affectedpath);
+				mutil_affected_path.add(temp);
+			}
+		} else {
+			for (String affectedpath : allAffectedPaths) {
+				List<String> temp = new ArrayList<String>();
+				temp.add(affectedpath);
+				mutil_affected_path.add(temp);
+			}
+
+		}
+		return mutil_affected_path;
 	}
 
 	@Override
