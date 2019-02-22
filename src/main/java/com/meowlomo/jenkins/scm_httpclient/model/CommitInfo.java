@@ -2,6 +2,7 @@ package com.meowlomo.jenkins.scm_httpclient.model;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -73,8 +74,8 @@ public class CommitInfo {
 		return commits;
 	}
 
-	public void doSaveAffectedPathsWork(String regexString, String addScmPath, List<ChangeLogSet<? extends Entry>> changeSets,
-			PrintStream logger, Map<String, String> variables) {
+	public void doSaveAffectedPathsWork(String regexString, String addScmPath,
+			List<ChangeLogSet<? extends Entry>> changeSets, PrintStream logger, Map<String, String> variables) {
 		// Set element is unique
 		Set<String> allAffectedPaths = new HashSet<String>();
 		if (!changeSets.isEmpty()) {
@@ -92,14 +93,31 @@ public class CommitInfo {
 					}
 				}
 			}
+
+			Set<List<String>> mutil_affected_path = new HashSet<List<String>>();
 			// add scm path
-			saveAffectedPathsToJson(allAffectedPaths, variables);
+			if (!addScmPath.equals("")) {
+				List<String> result = Arrays.asList(addScmPath.split(","));
+				for (String affectedpath : allAffectedPaths) {
+					List<String> temp = result;
+					temp.add(affectedpath);
+					mutil_affected_path.add(temp);
+				}
+			} else {
+				for (String affectedpath : allAffectedPaths) {
+					List<String> temp = new ArrayList<String>();
+					temp.add(affectedpath);
+					mutil_affected_path.add(temp);
+				}
+
+			}
+			saveAffectedPathsToJson(mutil_affected_path, variables);
 		}
 	}
 
-	private void saveAffectedPathsToJson(Set<String> affectedPaths, Map<String, String> variables) {
-		if (!affectedPaths.isEmpty()) {
-			String AFFECTED_PATH = JSON.toJSONString(affectedPaths);
+	private void saveAffectedPathsToJson(Set<List<String>> mutil_affected_path, Map<String, String> variables) {
+		if (!mutil_affected_path.isEmpty()) {
+			String AFFECTED_PATH = JSON.toJSONString(mutil_affected_path);
 			variables.put(ExcutionConstant.AFFECTED_PATH, AFFECTED_PATH);
 		}
 	}
