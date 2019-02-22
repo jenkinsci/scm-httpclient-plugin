@@ -73,7 +73,7 @@ public class CommitInfo {
 		return commits;
 	}
 
-	public void doSaveAffectedPathsWork(String regexString, List<ChangeLogSet<? extends Entry>> changeSets,
+	public void doSaveAffectedPathsWork(String regexString, String addScmPath, List<ChangeLogSet<? extends Entry>> changeSets,
 			PrintStream logger, Map<String, String> variables) {
 		// Set element is unique
 		Set<String> allAffectedPaths = new HashSet<String>();
@@ -92,6 +92,7 @@ public class CommitInfo {
 					}
 				}
 			}
+			// add scm path
 			saveAffectedPathsToJson(allAffectedPaths, variables);
 		}
 	}

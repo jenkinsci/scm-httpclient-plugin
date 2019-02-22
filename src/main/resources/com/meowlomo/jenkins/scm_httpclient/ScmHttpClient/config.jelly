@@ -6,8 +6,11 @@
   <f:entry title="Save JOB_BUILD_MESSAGE" field="saveJobBuildMessage">
         <f:checkbox />
   </f:entry>
-  <f:section title="Regular Expression">
+  <f:section title="Customer Expression">
      <f:entry title="Regex string" field="regexString">
+	    <f:textbox />
+	 </f:entry>
+	 <f:entry title="Add scmPath" field="addScmPath">
 	    <f:textbox />
 	 </f:entry>
   </f:section>

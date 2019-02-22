@@ -52,6 +52,8 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	private boolean saveJobBuildMessage;
 
 	private String regexString;
+	
+	private String addScmPath;
 
 	private boolean sendHttpRequest;
 
@@ -83,7 +85,7 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 
 			CommitInfo commitInfo = new CommitInfo();
 			if (saveAffectedPath) {
-				commitInfo.doSaveAffectedPathsWork(regexString, build.getChangeSets(), logger, variables);
+				commitInfo.doSaveAffectedPathsWork(regexString, addScmPath, build.getChangeSets(), logger, variables);
 			}
 
 			JobBuildMessage jobBuildMessage = new JobBuildMessage();
@@ -245,6 +247,15 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	@DataBoundSetter
 	public void setRegexString(String regexString) {
 		this.regexString = regexString;
+	}
+	
+	public String getAddScmPath() {
+		return addScmPath;
+	}
+
+	@DataBoundSetter
+	public void setAddScmPath(String addScmPath) {
+		this.addScmPath = addScmPath;
 	}
 
 	public String getRequestBody() {
