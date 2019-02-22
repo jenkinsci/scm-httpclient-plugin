@@ -87,7 +87,7 @@ public class CommitInfo {
 						String path = (String) it.next();
 						// do regular expression work, each affectedpath will be handled.
 						if (!regexString.equals("") && regexString != null) {
-							RegularExpressionUtil.handleString(regexString, path, logger);
+							path = RegularExpressionUtil.handleString(regexString, path, logger);
 						}
 						allAffectedPaths.add(path);
 					}
@@ -99,7 +99,8 @@ public class CommitInfo {
 			if (!addScmPath.equals("")) {
 				List<String> result = Arrays.asList(addScmPath.split(","));
 				for (String affectedpath : allAffectedPaths) {
-					List<String> temp = result;
+					List<String> temp = new ArrayList<String>();
+					temp.addAll(result);
 					temp.add(affectedpath);
 					mutil_affected_path.add(temp);
 				}
