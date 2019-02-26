@@ -111,6 +111,7 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	}
 
 	@Extension
+	@Symbol("scmHttpClient")
 	public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 		public static final String validResponseCodes = "100:399";
 

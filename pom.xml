@@ -18,7 +18,7 @@
 
     <name>SCM HttpClient</name>
     <description>stored the scm changes and job build message as http request body to trigger service.</description>
-
+    <url>https://wiki.jenkins.io/display/JENKINS/SCM+HttpClient+Plugin</url>
     <licenses>
         <license>
             <name>MIT License</name>
@@ -35,7 +35,7 @@
     <developers>
         <developer>
             <id>meowlomo</id>
-            <name>Rich</name>
+            <name>rich chen</name>
             <email>dev.support@meowlomo.com</email>
         </developer>
     </developers>
