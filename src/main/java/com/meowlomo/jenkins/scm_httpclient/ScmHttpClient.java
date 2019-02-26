@@ -40,6 +40,7 @@ import hudson.tasks.Recorder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.tasks.SimpleBuildStep;
+import org.jenkinsci.Symbol;
 
 public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializable {
 
