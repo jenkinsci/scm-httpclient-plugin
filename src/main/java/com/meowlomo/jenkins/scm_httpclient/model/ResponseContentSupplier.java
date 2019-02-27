@@ -55,9 +55,10 @@ public class ResponseContentSupplier implements Serializable, AutoCloseable {
 				byte[] bytes = ByteStreams.toByteArray(entityContent);
 				contentStream = new ByteArrayInputStream(bytes);
 				content = new String(bytes, Strings.isNullOrEmpty(charset) ? Charset.defaultCharset().name() : charset);
-			} else {
-				contentStream = entityContent;
 			}
+//			else {
+//				contentStream = entityContent;
+//			}
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}

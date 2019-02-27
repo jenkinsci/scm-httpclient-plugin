@@ -52,8 +52,8 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 
 	private boolean saveJobBuildMessage;
 
-	private String regexString;
-	
+	private String regexString = "";
+
 	private String addScmPath;
 
 	private boolean sendHttpRequest;
@@ -81,23 +81,8 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 		AbstractBuild<?, ?> build = (AbstractBuild<?, ?>) run;
 		EnvVars envVars = build.getEnvironment(listener);
 		PrintStream logger = listener.getLogger();
-		if (!build.getChangeSets().isEmpty()) {
-			logger.println("the scm has changed...");
-
-			CommitInfo commitInfo = new CommitInfo();
-			if (saveAffectedPath) {
-				commitInfo.doSaveAffectedPathsWork(regexString, addScmPath, build.getChangeSets(), logger, variables);
-			}
-
-			JobBuildMessage jobBuildMessage = new JobBuildMessage();
-			if (saveJobBuildMessage) {
-				jobBuildMessage.doSaveJobBuildMessageWork(envVars, commitInfo.getCommitInfos(build.getChangeSets()),
-						variables);
-			}
-
-		} else {
-			logger.println("the scm hasn't changed.");
-		}
+		new ScmExcution(build, envVars, logger, saveAffectedPath, saveJobBuildMessage, regexString, addScmPath,
+				variables);
 
 		if (sendHttpRequest) {
 			HttpRequestExcution httpRequestExcution = new HttpRequestExcution();
@@ -250,7 +235,7 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	public void setRegexString(String regexString) {
 		this.regexString = regexString;
 	}
-	
+
 	public String getAddScmPath() {
 		return addScmPath;
 	}

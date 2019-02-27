@@ -86,7 +86,7 @@ public class CommitInfo {
 					while (it.hasNext()) {
 						String path = (String) it.next();
 						// do regular expression work, each affectedpath will be handled.
-						if (!regexString.equals("") && regexString != null) {
+						if (!regexString.equals("")) {
 							path = RegularExpressionUtil.handleString(regexString, path, logger);
 						}
 						allAffectedPaths.add(path);
