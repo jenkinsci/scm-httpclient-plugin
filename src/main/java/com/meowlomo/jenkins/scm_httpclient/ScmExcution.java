@@ -10,17 +10,14 @@ import hudson.EnvVars;
 import hudson.model.AbstractBuild;
 
 public class ScmExcution {
-	final AbstractBuild<?, ?> build;
 	private PrintStream logger;
 	private EnvVars envVars;
 
 	public ScmExcution(AbstractBuild<?, ?> build, EnvVars envVars, PrintStream logger, boolean saveAffectedPath,
 			boolean saveJobBuildMessage, String regexString, String addScmPath, Map<String, String> variables) {
-		this.build = build;
-		AbstractBuild<?, ?> b = build;
 		this.logger = logger;
 		this.envVars = envVars;
-		process(b, saveAffectedPath, saveJobBuildMessage, regexString, addScmPath, variables);
+		process(build, saveAffectedPath, saveJobBuildMessage, regexString, addScmPath, variables);
 	}
 
 	public void process(AbstractBuild<?, ?> build, boolean saveAffectedPath, boolean saveJobBuildMessage,
