@@ -19,6 +19,7 @@ import org.apache.http.protocol.HttpContext;
 
 import com.google.common.collect.Range;
 import com.meowlomo.jenkins.scm_httpclient.ScmHttpClient.DescriptorImpl;
+import com.meowlomo.jenkins.scm_httpclient.auth.Authenticator;
 import com.meowlomo.jenkins.scm_httpclient.constant.HttpMode;
 import com.meowlomo.jenkins.scm_httpclient.constant.MimeType;
 import com.meowlomo.jenkins.scm_httpclient.model.ResponseContentSupplier;
@@ -35,6 +36,7 @@ import hudson.model.TaskListener;
 public class HttpRequestExcution {
 
 	private String url;
+	private String credentialId;
 	private HttpMode httpMode;
 	private String body;
 	private MimeType contentType;
@@ -48,9 +50,10 @@ public class HttpRequestExcution {
 
 	}
 
-	private HttpRequestExcution(String url, HttpMode httpMode, String body, MimeType contentType,
+	private HttpRequestExcution(String url, String credentialId, HttpMode httpMode, String body, MimeType contentType,
 			List<HttpRequestNameValuePair> headers, String validResponseCodes, String validResponseContent) {
 		this.url = url;
+		this.credentialId = credentialId;
 		this.httpMode = httpMode;
 		this.body = body;
 		this.contentType = contentType;
@@ -61,13 +64,14 @@ public class HttpRequestExcution {
 
 	public HttpRequestExcution from(ScmHttpClient shc, EnvVars envVars, Run<?, ?> run, TaskListener taskListener) {
 		this.url = shc.getUrl();
+		this.credentialId = shc.getCredentialId();	
 		this.httpMode = shc.getHttpMode();
 		this.body = resolveBody(shc.getRequestBody(), shc.variables);
 		this.contentType = shc.getContentType();
 		this.validResponseCodes = shc.getValidResponseCodes();
 		this.validResponseContent = shc.getValidResponseContent();
 		List<HttpRequestNameValuePair> headers = resolveHeaders(envVars);
-		HttpRequestExcution httpExcusion = new HttpRequestExcution(url, httpMode, body, contentType, headers,
+		HttpRequestExcution httpExcusion = new HttpRequestExcution(url, credentialId, httpMode, body, contentType, headers,
 				validResponseCodes, validResponseContent);
 		this.headers = headers;
 		localLogger = taskListener.getLogger();

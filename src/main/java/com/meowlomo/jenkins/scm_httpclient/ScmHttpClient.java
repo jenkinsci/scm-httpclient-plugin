@@ -12,16 +12,23 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import org.jenkinsci.Symbol;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
+import com.cloudbees.plugins.credentials.common.AbstractIdCredentialsListBoxModel;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
+import com.meowlomo.jenkins.scm_httpclient.auth.BasicDigestAuthentication;
+import com.meowlomo.jenkins.scm_httpclient.auth.FormAuthentication;
 import com.meowlomo.jenkins.scm_httpclient.constant.HttpMode;
 import com.meowlomo.jenkins.scm_httpclient.constant.MimeType;
-import com.meowlomo.jenkins.scm_httpclient.model.CommitInfo;
-import com.meowlomo.jenkins.scm_httpclient.model.JobBuildMessage;
 import com.meowlomo.jenkins.scm_httpclient.util.HttpRequestNameValuePair;
 import com.meowlomo.jenkins.scm_httpclient.util.UnescapeUtil;
 
@@ -31,16 +38,18 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import hudson.util.ListBoxModel.Option;
 import jenkins.tasks.SimpleBuildStep;
-import org.jenkinsci.Symbol;
 
 public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializable {
 
@@ -59,6 +68,8 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	private boolean sendHttpRequest;
 
 	private @Nonnull String url;
+	
+	private  String credentialId;
 
 	private HttpMode httpMode;
 
@@ -110,6 +121,32 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 		public String getDisplayName() {
 			return "SCM HttpClient";
 		}
+		
+		public ListBoxModel doFillCredentialIdItems(@AncestorInPath Item project, @QueryParameter String url) {
+			return fillCredentialIdItems(project, url);
+		}
+		
+		public static ListBoxModel fillCredentialIdItems(Item project, String url) {
+			if (project == null || !project.hasPermission(Item.CONFIGURE)) {
+				return new StandardListBoxModel();
+			}
+			List<Option> options = new ArrayList<>();
+			for (BasicDigestAuthentication basic : HttpRequestGlobalConfig.get().getBasicDigestAuthentications()) {
+				options.add(new Option("(deprecated - use Jenkins Credentials) " +
+						basic.getKeyName(), basic.getKeyName()));
+            }
+
+            for (FormAuthentication formAuthentication : HttpRequestGlobalConfig.get().getFormAuthentications()) {
+				options.add(new Option(formAuthentication.getKeyName()));
+			}
+			AbstractIdCredentialsListBoxModel<StandardListBoxModel, StandardCredentials> items = new StandardListBoxModel()
+					.includeEmptyValue()
+					.includeAs(ACL.SYSTEM,
+							project, StandardUsernamePasswordCredentials.class,
+							URIRequirementBuilder.fromUri(url).build());
+			items.addMissing(options);
+            return items;
+        }
 
 		public ListBoxModel doFillHttpModeItems() {
 			return HttpMode.getFillItems();
@@ -207,6 +244,15 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	@Nonnull
 	public String getUrl() {
 		return url;
+	}
+	
+	public String getCredentialId() {
+		return credentialId;
+	}
+	
+	@DataBoundSetter
+	public void setCredentialId(String credentialId) {
+		this.credentialId = credentialId;
 	}
 
 	public HttpMode getHttpMode() {

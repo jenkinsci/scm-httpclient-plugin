@@ -21,6 +21,9 @@
   	<f:entry field="url" title="URL">
         <f:textbox />
     </f:entry>
+    <f:entry field="credentialId" title="Credential">
+        <f:select />
+    </f:entry>
     <f:entry field="httpMode" title="HTTP mode">
         <f:select />
     </f:entry>
