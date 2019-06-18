@@ -75,7 +75,6 @@ public class HttpClientUtil {
 					break;
 				}
 			}
-
 			return new StringEntity(requestAction.getRequestBody(), contentType);
 		}
 		return toUrlEncoded(requestAction.getParams());

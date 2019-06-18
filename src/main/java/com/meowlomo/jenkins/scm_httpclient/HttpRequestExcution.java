@@ -88,6 +88,11 @@ public class HttpRequestExcution {
 			if (!body.equals("")) {
 				localLogger.println("RequestBody:" + body);
 			}
+			
+			String access_token = ScmHttpClient.access_token;
+			if (!access_token.isEmpty()) {
+				headers.add(new HttpRequestNameValuePair("Authorization", "Bearer " + access_token));	
+			}
 			HttpRequestBase httpRequestBase = clientUtil
 					.createRequestBase(new RequestAction(new URL(url), httpMode, body, null, headers));
 			HttpContext context = new BasicHttpContext();

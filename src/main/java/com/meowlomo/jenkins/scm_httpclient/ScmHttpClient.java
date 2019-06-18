@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,12 +13,21 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
+import com.alibaba.fastjson.JSON;
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.AbstractIdCredentialsListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
@@ -25,11 +35,15 @@ import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredenti
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
+import com.meowlomo.jenkins.scm_httpclient.auth.Authenticator;
 import com.meowlomo.jenkins.scm_httpclient.auth.BasicDigestAuthentication;
 import com.meowlomo.jenkins.scm_httpclient.auth.FormAuthentication;
 import com.meowlomo.jenkins.scm_httpclient.constant.HttpMode;
 import com.meowlomo.jenkins.scm_httpclient.constant.MimeType;
+import com.meowlomo.jenkins.scm_httpclient.model.ResponseContentSupplier;
+import com.meowlomo.jenkins.scm_httpclient.util.HttpClientUtil;
 import com.meowlomo.jenkins.scm_httpclient.util.HttpRequestNameValuePair;
+import com.meowlomo.jenkins.scm_httpclient.util.RequestAction;
 import com.meowlomo.jenkins.scm_httpclient.util.UnescapeUtil;
 
 import hudson.EnvVars;
@@ -80,6 +94,8 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	private String validResponseContent;
 
 	private String requestBody;
+	
+	static String access_token = "";
 
 	@DataBoundConstructor
 	public ScmHttpClient(String url) {
@@ -154,6 +170,61 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 
 		public ListBoxModel doFillContentTypeItems() {
 			return MimeType.getContentTypeFillItems();
+		}
+		
+		public FormValidation doCheckCredentialId(@AncestorInPath Item project, @QueryParameter String url, @QueryParameter String value) {
+			return checkCredentialId(project,url,value);
+		}
+		public static FormValidation checkCredentialId(Item project, String url, String authentication) {
+			if (url == null)
+			// not set, can't check
+			{
+				return FormValidation.ok();
+	        }
+			if (authentication != null && !authentication.isEmpty()) {
+				Authenticator auth = HttpRequestGlobalConfig.get().getAuthentication(authentication);
+
+				if (auth == null) {
+					StandardUsernamePasswordCredentials credential = CredentialsMatchers.firstOrNull(
+							CredentialsProvider.lookupCredentials(
+									StandardUsernamePasswordCredentials.class,
+									project, ACL.SYSTEM,
+									URIRequirementBuilder.fromUri(url).build()),
+							CredentialsMatchers.withId(authentication));
+					if (credential != null) {
+						String userName = credential.getUsername();
+						String password = credential.getPassword().getPlainText();
+						List<HttpRequestNameValuePair> headers = new ArrayList<>();
+						headers.add(new HttpRequestNameValuePair("content-type","application/x-www-form-urlencoded"));
+						String body = "email=" + userName + "&" + "password=" + password;
+						try {
+							HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+							CloseableHttpClient httpclient = clientBuilder.build();
+							HttpClientUtil clientUtil = new HttpClientUtil();
+							HttpRequestBase httpRequestBase = clientUtil
+									.createRequestBase(new RequestAction(new URL(url), HttpMode.POST, body, null, headers));
+							
+							String authUrl = "http://" + httpRequestBase.getURI().getHost()+"/api/auth/login";
+							HttpRequestBase hrb = clientUtil
+									.createRequestBase(new RequestAction(new URL(authUrl), HttpMode.POST, body, null, headers));
+							HttpContext context = new BasicHttpContext();
+							final HttpResponse response = httpclient.execute(hrb, context);
+							
+							ResponseContentSupplier responseContentSupplier = new ResponseContentSupplier(response);
+							if(responseContentSupplier.getStatus() == 200) {
+								String content = responseContentSupplier.getContent();
+								access_token = (String) JSON.parseObject(content).get("access_token");
+							} else {
+								access_token = "";
+								return FormValidation.error("Authentication failed for \'" + authentication + "\'." + "returned status code" + responseContentSupplier.getStatus());
+							}
+						} catch (Exception e) {
+							return FormValidation.error("Authentication failed for \'" + authentication + "\'." + e);
+						}
+					}
+				}
+			}
+			return FormValidation.ok();
 		}
 
 		public FormValidation doCheckValidResponseCodes(@QueryParameter String value) {
