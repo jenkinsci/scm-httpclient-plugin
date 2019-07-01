@@ -37,7 +37,6 @@ import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 import com.meowlomo.jenkins.scm_httpclient.auth.Authenticator;
 import com.meowlomo.jenkins.scm_httpclient.auth.BasicDigestAuthentication;
-import com.meowlomo.jenkins.scm_httpclient.auth.FormAuthentication;
 import com.meowlomo.jenkins.scm_httpclient.constant.HttpMode;
 import com.meowlomo.jenkins.scm_httpclient.constant.MimeType;
 import com.meowlomo.jenkins.scm_httpclient.model.ResponseContentSupplier;
@@ -70,6 +69,8 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	private static final long serialVersionUID = 1L;
 
 	Map<String, String> variables = new HashMap<String, String>();
+	
+	static HttpRequestGlobalConf hgc = new HttpRequestGlobalConf();
 
 	private boolean saveAffectedPath;
 
@@ -147,14 +148,11 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 				return new StandardListBoxModel();
 			}
 			List<Option> options = new ArrayList<>();
-			for (BasicDigestAuthentication basic : HttpRequestGlobalConfig.get().getBasicDigestAuthentications()) {
+			for (BasicDigestAuthentication basic : hgc.getBasicDigestAuthentications()) {
 				options.add(new Option("(deprecated - use Jenkins Credentials) " +
 						basic.getKeyName(), basic.getKeyName()));
             }
 
-            for (FormAuthentication formAuthentication : HttpRequestGlobalConfig.get().getFormAuthentications()) {
-				options.add(new Option(formAuthentication.getKeyName()));
-			}
 			AbstractIdCredentialsListBoxModel<StandardListBoxModel, StandardCredentials> items = new StandardListBoxModel()
 					.includeEmptyValue()
 					.includeAs(ACL.SYSTEM,
@@ -182,7 +180,7 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 				return FormValidation.ok();
 	        }
 			if (authentication != null && !authentication.isEmpty()) {
-				Authenticator auth = HttpRequestGlobalConfig.get().getAuthentication(authentication);
+				Authenticator auth = hgc.getAuthentication(authentication);
 
 				if (auth == null) {
 					StandardUsernamePasswordCredentials credential = CredentialsMatchers.firstOrNull(
@@ -210,6 +208,7 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 							HttpContext context = new BasicHttpContext();
 							final HttpResponse response = httpclient.execute(hrb, context);
 							
+							@SuppressWarnings("resource")
 							ResponseContentSupplier responseContentSupplier = new ResponseContentSupplier(response);
 							if(responseContentSupplier.getStatus() == 200) {
 								String content = responseContentSupplier.getContent();

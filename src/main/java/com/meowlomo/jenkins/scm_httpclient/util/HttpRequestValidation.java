@@ -2,9 +2,6 @@ package com.meowlomo.jenkins.scm_httpclient.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import hudson.util.FormValidation;
 
