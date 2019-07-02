@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.meowlomo.jenkins</groupId>
     <artifactId>scm-httpclient</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.4</version>
     <packaging>hpi</packaging>
     <properties>
         <jenkins.version>2.121.1</jenkins.version>
@@ -30,7 +30,7 @@
         <connection>scm:git:git://github.com:jenkinsci/scm-httpclient-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/scm-httpclient-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/scm-httpclient-plugin.git</url>
-		<tag>HEAD</tag>
+		<tag>scm-httpclient-1.4</tag>
     </scm>
 
     <developers>
