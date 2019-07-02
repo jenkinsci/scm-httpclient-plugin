@@ -19,7 +19,6 @@ import org.apache.http.protocol.HttpContext;
 
 import com.google.common.collect.Range;
 import com.meowlomo.jenkins.scm_httpclient.ScmHttpClient.DescriptorImpl;
-import com.meowlomo.jenkins.scm_httpclient.auth.Authenticator;
 import com.meowlomo.jenkins.scm_httpclient.constant.HttpMode;
 import com.meowlomo.jenkins.scm_httpclient.constant.MimeType;
 import com.meowlomo.jenkins.scm_httpclient.model.ResponseContentSupplier;

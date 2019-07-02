@@ -6,23 +6,8 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HttpContext;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
 
-import com.meowlomo.jenkins.scm_httpclient.HttpRequestGlobalConfig;
-
-import hudson.Extension;
-import hudson.model.AbstractDescribableImpl;
-import hudson.model.Descriptor;
-import hudson.util.FormValidation;
-
-
-/**
- * @author Janario Oliveira
- * @deprecated use Jenkins credentials, marked to remove in 1.8.19
- */
-@Deprecated
-public class BasicDigestAuthentication extends AbstractDescribableImpl<BasicDigestAuthentication>
+public class BasicDigestAuthentication
         implements Authenticator {
 	private static final long serialVersionUID = 4818288270720177069L;
 
@@ -30,7 +15,6 @@ public class BasicDigestAuthentication extends AbstractDescribableImpl<BasicDige
     private final String userName;
     private final String password;
 
-    @DataBoundConstructor
     public BasicDigestAuthentication(String keyName, String userName,
             String password) {
         this.keyName = keyName;
@@ -53,28 +37,6 @@ public class BasicDigestAuthentication extends AbstractDescribableImpl<BasicDige
 	@Override
 	public CloseableHttpClient authenticate(HttpClientBuilder clientBuilder, HttpContext context,
 											HttpRequestBase requestBase, PrintStream logger) {
-		System.out.println("userName"+userName+"-password"+password);
 		return CredentialBasicAuthentication.auth(clientBuilder, context, requestBase, userName, password);
 	}
-
-    @Extension
-    public static class BasicDigestAuthenticationDescriptor extends Descriptor<BasicDigestAuthentication> {
-
-        public FormValidation doCheckKeyName(@QueryParameter String value) {
-            return HttpRequestGlobalConfig.validateKeyName(value);
-        }
-
-        public FormValidation doCheckUserName(@QueryParameter String value) {
-            return FormValidation.validateRequired(value);
-        }
-
-        public FormValidation doCheckPassword(@QueryParameter String value) {
-            return FormValidation.validateRequired(value);
-        }
-
-        @Override
-        public String getDisplayName() {
-            return "Basic/Digest Authentication";
-        }
-    }
 }
