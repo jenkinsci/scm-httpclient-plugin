@@ -62,6 +62,7 @@ import hudson.tasks.Recorder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import hudson.util.ListBoxModel.Option;
+import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 
 public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializable {
@@ -114,6 +115,7 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 
 		if (sendHttpRequest) {
 			HttpRequestExcution httpRequestExcution = new HttpRequestExcution();
+			access_token = getLoginToken(url,credentialId);
 			httpRequestExcution.from(this, envVars, run, listener);
 			httpRequestExcution.request();
 		}
@@ -211,10 +213,10 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 							@SuppressWarnings("resource")
 							ResponseContentSupplier responseContentSupplier = new ResponseContentSupplier(response);
 							if(responseContentSupplier.getStatus() == 200) {
-								String content = responseContentSupplier.getContent();
-								access_token = (String) JSON.parseObject(content).get("access_token");
+//								String content = responseContentSupplier.getContent();
+//								access_token = (String) JSON.parseObject(content).get("access_token");
 							} else {
-								access_token = "";
+//								access_token = "";
 								return FormValidation.error("Authentication failed for \'" + authentication + "\'." + "returned status code" + responseContentSupplier.getStatus());
 							}
 						} catch (Exception e) {
@@ -278,6 +280,54 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 			headers.add(new HttpRequestNameValuePair("Content-type", contentType.getContentType().toString()));
 		}
 		return headers;
+	}
+	
+	String getLoginToken(String url,String authentication) {
+		if (authentication != null && !authentication.isEmpty()) {
+			Authenticator auth = hgc.getAuthentication(authentication);
+			if (auth == null) {
+				@SuppressWarnings("deprecation")
+				StandardUsernamePasswordCredentials credential = CredentialsMatchers.firstOrNull(
+						CredentialsProvider.lookupCredentials(
+								StandardUsernamePasswordCredentials.class,
+								Jenkins.getInstance(), ACL.SYSTEM,
+								URIRequirementBuilder.fromUri(url).build()),
+						CredentialsMatchers.withId(authentication));
+				if (credential != null) {
+					String userName = credential.getUsername();
+					String password = credential.getPassword().getPlainText();
+					List<HttpRequestNameValuePair> headers = new ArrayList<>();
+					headers.add(new HttpRequestNameValuePair("content-type","application/x-www-form-urlencoded"));
+					String body = "email=" + userName + "&" + "password=" + password;
+					try {
+						HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+						CloseableHttpClient httpclient = clientBuilder.build();
+						HttpClientUtil clientUtil = new HttpClientUtil();
+						HttpRequestBase httpRequestBase = clientUtil
+								.createRequestBase(new RequestAction(new URL(url), HttpMode.POST, body, null, headers));
+						
+						String authUrl = "http://" + httpRequestBase.getURI().getHost()+"/api/auth/login";
+						HttpRequestBase hrb = clientUtil
+								.createRequestBase(new RequestAction(new URL(authUrl), HttpMode.POST, body, null, headers));
+						HttpContext context = new BasicHttpContext();
+						final HttpResponse response = httpclient.execute(hrb, context);
+						
+						@SuppressWarnings("resource")
+						ResponseContentSupplier responseContentSupplier = new ResponseContentSupplier(response);
+						if(responseContentSupplier.getStatus() == 200) {
+							String content = responseContentSupplier.getContent();
+							access_token = (String) JSON.parseObject(content).get("access_token");
+						} else {
+							// clear
+							access_token = "";
+						}
+					} catch (Exception e) {
+						throw new IllegalStateException(e);
+					}
+				}
+			}
+		}
+		return access_token;
 	}
 
 	public String resolveBody() {
