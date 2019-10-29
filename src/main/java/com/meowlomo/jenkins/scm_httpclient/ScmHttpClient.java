@@ -85,7 +85,7 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 
 	private @Nonnull String url;
 	
-	private  String credentialId;
+	private String credentialId;
 
 	private HttpMode httpMode;
 
@@ -96,8 +96,6 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 	private String validResponseContent;
 
 	private String requestBody;
-	
-	static String access_token = "";
 
 	@DataBoundConstructor
 	public ScmHttpClient(String url) {
@@ -113,11 +111,10 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 		new ScmExcution(build, envVars, logger, saveAffectedPath, saveJobBuildMessage, regexString, addScmPath,
 				variables);
 
-		if (sendHttpRequest) {
+		if(sendHttpRequest) {
 			HttpRequestExcution httpRequestExcution = new HttpRequestExcution();
-			access_token = getLoginToken(url,credentialId);
 			httpRequestExcution.from(this, envVars, run, listener);
-			httpRequestExcution.request();
+			httpRequestExcution.request(getLoginToken(url,credentialId));
 		}
 	}
 
@@ -282,7 +279,8 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 		return headers;
 	}
 	
-	String getLoginToken(String url,String authentication) {
+	String getLoginToken(String url, String authentication) {
+		String access_token = "";
 		if (authentication != null && !authentication.isEmpty()) {
 			Authenticator auth = hgc.getAuthentication(authentication);
 			if (auth == null) {
@@ -317,9 +315,6 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 						if(responseContentSupplier.getStatus() == 200) {
 							String content = responseContentSupplier.getContent();
 							access_token = (String) JSON.parseObject(content).get("access_token");
-						} else {
-							// clear
-							access_token = "";
 						}
 					} catch (Exception e) {
 						throw new IllegalStateException(e);

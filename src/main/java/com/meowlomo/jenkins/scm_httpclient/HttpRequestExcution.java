@@ -77,7 +77,7 @@ public class HttpRequestExcution {
 		return httpExcusion;
 	}
 
-	public ResponseContentSupplier request() {
+	public ResponseContentSupplier request(String access_token) {
 		try {
 			HttpClientBuilder clientBuilder = HttpClientBuilder.create();
 			CloseableHttpClient httpclient = clientBuilder.build();
@@ -88,7 +88,6 @@ public class HttpRequestExcution {
 				localLogger.println("RequestBody:" + body);
 			}
 			
-			String access_token = ScmHttpClient.access_token;
 			if (!access_token.isEmpty()) {
 				headers.add(new HttpRequestNameValuePair("Authorization", "Bearer " + access_token));	
 			}
