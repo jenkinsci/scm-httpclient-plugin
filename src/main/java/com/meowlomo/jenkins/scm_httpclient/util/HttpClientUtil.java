@@ -24,7 +24,6 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.protocol.HttpContext;
 
-import com.google.common.base.Strings;
 import com.meowlomo.jenkins.scm_httpclient.constant.HttpMode;
 
 public class HttpClientUtil {
@@ -67,7 +66,7 @@ public class HttpClientUtil {
 
 	private HttpEntity makeEntity(RequestAction requestAction) throws
 			UnsupportedEncodingException {
-		if (!Strings.isNullOrEmpty(requestAction.getRequestBody())) {
+		if (requestAction.getRequestBody() != null && !requestAction.getRequestBody().isEmpty()) {
 			ContentType contentType = null;
 			for (HttpRequestNameValuePair header : requestAction.getHeaders()) {
 				if ("Content-type".equalsIgnoreCase(header.getName())) {

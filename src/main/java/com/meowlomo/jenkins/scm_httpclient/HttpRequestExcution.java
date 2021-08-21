@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -17,7 +18,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
-import com.google.common.collect.Range;
 import com.meowlomo.jenkins.scm_httpclient.ScmHttpClient.DescriptorImpl;
 import com.meowlomo.jenkins.scm_httpclient.constant.HttpMode;
 import com.meowlomo.jenkins.scm_httpclient.constant.MimeType;
@@ -151,14 +151,14 @@ public class HttpRequestExcution {
 	}
 
 	private void responseCodeIsValid(ResponseContentSupplier response) throws AbortException {
-		List<Range<Integer>> ranges = DescriptorImpl.parseToRange(validResponseCodes);
-		for (Range<Integer> range : ranges) {
-			if (range.contains(response.getStatus())) {
+		List<IntStream> ranges = DescriptorImpl.parseToRange(validResponseCodes);
+		for (IntStream range : ranges) {
+			if (range.anyMatch(status -> status == response.getStatus())) {
 				localLogger.println("Success code from " + range);
 				return;
 			}
 		}
 		throw new AbortException(
-				"Fail: the returned code " + response.getStatus() + " is not in the accepted range: " + ranges);
+				"Fail: the returned code " + response.getStatus() + " is not in the accepted range: " + validResponseCodes);
 	}
 }
