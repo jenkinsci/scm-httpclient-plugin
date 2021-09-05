@@ -154,11 +154,11 @@ public class HttpRequestExcution {
 		List<IntStream> ranges = DescriptorImpl.parseToRange(validResponseCodes);
 		for (IntStream range : ranges) {
 			if (range.anyMatch(status -> status == response.getStatus())) {
-				localLogger.println("Success code from " + range);
+				localLogger.println("Success: Status code " + response.getStatus() + " is in the accepted range: " + validResponseCodes);
 				return;
 			}
 		}
 		throw new AbortException(
-				"Fail: the returned code " + response.getStatus() + " is not in the accepted range: " + validResponseCodes);
+				"Fail: Status code " + response.getStatus() + " is not in the accepted range: " + validResponseCodes);
 	}
 }
