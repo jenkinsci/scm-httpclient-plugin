@@ -10,14 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
-
-import com.google.common.base.Strings;
-import com.google.common.io.ByteStreams;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -52,9 +50,9 @@ public class ResponseContentSupplier implements Serializable, AutoCloseable {
 			InputStream entityContent = entity != null ? entity.getContent() : null;
 
 			if (entityContent != null) {
-				byte[] bytes = ByteStreams.toByteArray(entityContent);
+				byte[] bytes = IOUtils.toByteArray(entityContent);
 				contentStream = new ByteArrayInputStream(bytes);
-				content = new String(bytes, Strings.isNullOrEmpty(charset) ? Charset.defaultCharset().name() : charset);
+				content = new String(bytes, charset == null || charset.isEmpty() ? Charset.defaultCharset().name() : charset);
 			}
 //			else {
 //				contentStream = entityContent;

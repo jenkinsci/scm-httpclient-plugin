@@ -1,7 +1,5 @@
 package com.meowlomo.jenkins.scm_httpclient;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
@@ -10,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import javax.annotation.Nonnull;
 
@@ -33,8 +32,6 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
-import com.google.common.collect.Range;
-import com.google.common.collect.Ranges;
 import com.meowlomo.jenkins.scm_httpclient.auth.Authenticator;
 import com.meowlomo.jenkins.scm_httpclient.auth.BasicDigestAuthentication;
 import com.meowlomo.jenkins.scm_httpclient.constant.HttpMode;
@@ -242,12 +239,14 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 
 		}
 
-		public static List<Range<Integer>> parseToRange(String value) {
-			List<Range<Integer>> validRanges = new ArrayList<Range<Integer>>();
+		public static List<IntStream> parseToRange(String value) {
+			List<IntStream> validRanges = new ArrayList<>();
 			String[] codes = value.split(",");
 			for (String code : codes) {
 				String[] fromTo = code.trim().split(":");
-				checkArgument(fromTo.length <= 2, "Code %s should be an interval from:to or a single value", code);
+				if (fromTo.length > 2) {
+					throw new IllegalArgumentException(String.format("Code %s should be an interval from:to or a single value", code));
+				}
 
 				Integer from;
 				try {
@@ -264,8 +263,10 @@ public class ScmHttpClient extends Recorder implements SimpleBuildStep, Serializ
 						throw new IllegalArgumentException("Invalid number " + fromTo[1]);
 					}
 				}
-				checkArgument(from <= to, "Interval %s should be FROM less than TO", code);
-				validRanges.add(Ranges.closed(from, to));
+				if (from > to) {
+					throw new IllegalArgumentException(String.format("Interval %s should be FROM less than TO", code));
+				}
+				validRanges.add(IntStream.rangeClosed(from, to));
 			}
 			return validRanges;
 		}
